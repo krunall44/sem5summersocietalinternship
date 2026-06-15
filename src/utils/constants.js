@@ -32,6 +32,48 @@ export function fmtDate(d) {
   });
 }
 
+import { db } from "./firebase";
+import { 
+  collection, 
+  addDoc, 
+  updateDoc, 
+  doc, 
+  onSnapshot, 
+  query, 
+  orderBy 
+} from "firebase/firestore";
+
+// ── Firebase Helpers ───────────────────────────────────────────────────────
+const COMPLAINTS_COL = "complaints";
+
+export function subscribeToComplaints(callback) {
+  const q = query(collection(db, COMPLAINTS_COL), orderBy("date", "desc"));
+  return onSnapshot(q, (snapshot) => {
+    const list = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    callback(list);
+  });
+}
+
+export async function addComplaintToFirebase(c) {
+  try {
+    const { id, ...data } = c; // Firestore generates its own ID, but we can store ours inside or use Firestore's
+    await addDoc(collection(db, COMPLAINTS_COL), data);
+  } catch (e) {
+    console.error("Error adding document: ", e);
+  }
+}
+
+export async function patchComplaintInFirebase(id, patch) {
+  try {
+    // Note: This 'id' must be the Firestore Document ID
+    // We'll need to make sure we're passing the correct doc ID
+    const docRef = doc(db, COMPLAINTS_COL, id);
+    await updateDoc(docRef, patch);
+  } catch (e) {
+    console.error("Error updating document: ", e);
+  }
+}
+
 // ── AI helper ─────────────────────────────────────────────────────────────
 export async function callClaude(systemPrompt, userMessage) {
   try {
@@ -64,31 +106,3 @@ export async function callClaude(systemPrompt, userMessage) {
   }
 }
 
-  // ── Storage helpers ───────────────────────────────────────────────────────
-  const STORAGE_KEY = "hosteldesk-v3";
-
-  export async function loadComplaints() {
-    try {
-      if (!window.storage) {
-        const local = localStorage.getItem(STORAGE_KEY);
-        return local ? JSON.parse(local) : [];
-      }
-      const result = await window.storage.get(STORAGE_KEY, true);
-      return result ? JSON.parse(result.value) : [];
-    } catch (err) {
-      console.error("Load error:", err);
-      return [];
-    }
-  }
-
-export async function saveComplaints(list) {
-  try {
-    if (!window.storage) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-      return;
-    }
-    await window.storage.set(STORAGE_KEY, JSON.stringify(list), true);
-  } catch (e) {
-    console.error("Storage error:", e);
-  }
-}

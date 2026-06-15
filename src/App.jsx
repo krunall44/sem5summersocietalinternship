@@ -1,7 +1,11 @@
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { loadComplaints, saveComplaints } from "./utils/constants";
+import { 
+  subscribeToComplaints, 
+  addComplaintToFirebase, 
+  patchComplaintInFirebase 
+} from "./utils/constants";
 
 // Pages
 import Landing from "./components/Landing";
@@ -28,27 +32,15 @@ const ProtectedRoute = ({ children, allowedRole }) => {
 
 export default function App() {
   const [complaints, setComplaints] = useState([]);
-  const [ready, setReady] = useState(false);
+  const [loading, setLoading] = useState(true);
 
+  // Use Firebase Real-time Subscription
   useEffect(() => {
-    loadComplaints().then((list) => {
+    const unsubscribe = subscribeToComplaints((list) => {
       setComplaints(list);
-      setReady(true);
+      setLoading(false);
     });
-  }, []);
-
-  useEffect(() => {
-    if (ready) saveComplaints(complaints);
-  }, [complaints, ready]);
-
-  const addComplaint = useCallback((c) => {
-    setComplaints((prev) => [c, ...prev]);
-  }, []);
-
-  const patchComplaint = useCallback((id, patch) => {
-    setComplaints((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, ...patch } : c)),
-    );
+    return () => unsubscribe();
   }, []);
 
   const stats = {
@@ -57,6 +49,22 @@ export default function App() {
     inProgress: complaints.filter((c) => c.status === "In Progress").length,
     resolved: complaints.filter((c) => c.status === "Resolved").length,
   };
+
+  if (loading) {
+    return (
+      <div style={{ 
+        minHeight: "100vh", 
+        background: "#0D1B2A", 
+        display: "flex", 
+        alignItems: "center", 
+        justifyContent: "center",
+        color: "#E0F2FE",
+        fontFamily: "'Sora', sans-serif"
+      }}>
+        <h2>Loading HostelDesk...</h2>
+      </div>
+    );
+  }
 
   return (
     <Router>
@@ -81,8 +89,8 @@ export default function App() {
             <ProtectedRoute allowedRole="student">
               <StudentPortal 
                 complaints={complaints} 
-                addComplaint={addComplaint} 
-                patchComplaint={patchComplaint} 
+                addComplaint={addComplaintToFirebase} 
+                patchComplaint={patchComplaintInFirebase} 
               />
             </ProtectedRoute>
           } 
@@ -94,7 +102,7 @@ export default function App() {
             <ProtectedRoute allowedRole="management">
               <ManagementPanel 
                 complaints={complaints} 
-                patchComplaint={patchComplaint} 
+                patchComplaint={patchComplaintInFirebase} 
                 stats={stats} 
               />
             </ProtectedRoute>
