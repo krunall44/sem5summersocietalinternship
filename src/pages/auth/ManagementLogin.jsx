@@ -96,7 +96,7 @@ export default function ManagementLogin() {
               />
               <input
                 type="password"
-                placeholder="Admin Secret Code"
+                placeholder="Admin Code"
                 value={adminCode}
                 onChange={(e) => setAdminCode(e.target.value)}
                 style={inputStyle}

@@ -25,8 +25,8 @@ export default function StudentLogin() {
       if (isSignUp) {
         // Validation for Sign Up
         if (!email.endsWith(".edu") && !email.includes("college")) {
-           // Basic check for college email - you can customize this!
-           // setError("Please use your official college email.");
+           // Basic check for email - you can customize this!
+           // setError("Please use your official email.");
            // setLoading(false);
            // return;
         }
@@ -108,7 +108,7 @@ export default function StudentLogin() {
           )}
           <input
             type="email"
-            placeholder="College Email"
+            placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             style={inputStyle}
