@@ -8,7 +8,8 @@ import {
   PRIORITY_COLOR, 
   genId, 
   fmtDate, 
-  callClaude 
+  callClaude,
+  logoutUser
 } from "../../utils/constants";
 
 export default function StudentPortal({ complaints, addComplaint, patchComplaint }) {
@@ -197,8 +198,8 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
               ← Home
             </Link>
             <button
-              onClick={() => {
-                localStorage.removeItem("hosteldesk_user");
+              onClick={async () => {
+                await logoutUser();
                 window.location.href = "/";
               }}
               style={{

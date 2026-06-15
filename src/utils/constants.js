@@ -32,16 +32,35 @@ export function fmtDate(d) {
   });
 }
 
-import { db } from "./firebase";
+import { db, auth } from "./firebase";
 import { 
   collection, 
   addDoc, 
   updateDoc, 
   doc, 
+  getDoc,
+  setDoc,
   onSnapshot, 
   query, 
   orderBy 
 } from "firebase/firestore";
+import { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  signOut, 
+  onAuthStateChanged 
+} from "firebase/auth";
+
+// ── Auth Helpers ──────────────────────────────────────────────────────────
+export const loginUser = (email, password) => signInWithEmailAndPassword(auth, email, password);
+export const logoutUser = () => signOut(auth);
+export const observeAuth = (callback) => onAuthStateChanged(auth, callback);
+
+export async function getUserProfile(uid) {
+  const docRef = doc(db, "users", uid);
+  const snap = await getDoc(docRef);
+  return snap.exists() ? snap.data() : null;
+}
 
 // ── Firebase Helpers ───────────────────────────────────────────────────────
 const COMPLAINTS_COL = "complaints";

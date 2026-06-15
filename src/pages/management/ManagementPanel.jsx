@@ -6,7 +6,8 @@ import {
   STATUS_META, 
   PRIORITY_COLOR, 
   fmtDate, 
-  callClaude 
+  callClaude,
+  logoutUser
 } from "../../utils/constants";
 
 export default function ManagementPanel({ complaints, patchComplaint, stats }) {
@@ -153,8 +154,8 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
               ← Home
             </Link>
             <button
-              onClick={() => {
-                localStorage.removeItem("hosteldesk_user");
+              onClick={async () => {
+                await logoutUser();
                 window.location.href = "/";
               }}
               style={{

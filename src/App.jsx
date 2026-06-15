@@ -4,7 +4,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import { 
   subscribeToComplaints, 
   addComplaintToFirebase, 
-  patchComplaintInFirebase 
+  patchComplaintInFirebase,
+  observeAuth,
+  getUserProfile
 } from "./utils/constants";
 
 // Pages
@@ -15,10 +17,7 @@ import StudentLogin from "./pages/auth/StudentLogin";
 import ManagementLogin from "./pages/auth/ManagementLogin";
 
 // Protected Route Component
-const ProtectedRoute = ({ children, allowedRole }) => {
-  const userStr = localStorage.getItem("hosteldesk_user");
-  const user = userStr ? JSON.parse(userStr) : null;
-
+const ProtectedRoute = ({ children, allowedRole, user }) => {
   if (!user) {
     return <Navigate to="/" replace />;
   }
@@ -33,12 +32,26 @@ const ProtectedRoute = ({ children, allowedRole }) => {
 export default function App() {
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
+
+  // Auth Observer
+  useEffect(() => {
+    const unsubscribe = observeAuth(async (firebaseUser) => {
+      if (firebaseUser) {
+        const profile = await getUserProfile(firebaseUser.uid);
+        setUser(profile ? { ...firebaseUser, ...profile } : null);
+      } else {
+        setUser(null);
+      }
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
 
   // Use Firebase Real-time Subscription
   useEffect(() => {
     const unsubscribe = subscribeToComplaints((list) => {
       setComplaints(list);
-      setLoading(false);
     });
     return () => unsubscribe();
   }, []);
@@ -86,7 +99,7 @@ export default function App() {
         <Route 
           path="/student" 
           element={
-            <ProtectedRoute allowedRole="student">
+            <ProtectedRoute allowedRole="student" user={user}>
               <StudentPortal 
                 complaints={complaints} 
                 addComplaint={addComplaintToFirebase} 
@@ -99,7 +112,7 @@ export default function App() {
         <Route 
           path="/management" 
           element={
-            <ProtectedRoute allowedRole="management">
+            <ProtectedRoute allowedRole="management" user={user}>
               <ManagementPanel 
                 complaints={complaints} 
                 patchComplaint={patchComplaintInFirebase} 
