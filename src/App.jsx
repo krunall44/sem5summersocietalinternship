@@ -67,27 +67,28 @@ export default function App() {
     return (
       <div style={{ 
         minHeight: "100vh", 
-        background: "#0D1B2A", 
+        background: "var(--bg-dark)", 
         display: "flex", 
+        flexDirection: "column",
         alignItems: "center", 
         justifyContent: "center",
-        color: "#E0F2FE",
-        fontFamily: "'Sora', sans-serif"
+        color: "var(--text-dark-primary)",
+        gap: "16px"
       }}>
-        <h2>Loading HostelDesk...</h2>
+        <div style={{
+          width: "36px",
+          height: "36px",
+          border: "3px solid rgba(59, 130, 246, 0.1)",
+          borderTopColor: "var(--primary-dark)",
+          borderRadius: "50%",
+        }} className="animate-spin" />
+        <h2 style={{ fontSize: "16px", fontWeight: 500, letterSpacing: "0.5px" }}>Loading HostelDesk...</h2>
       </div>
     );
   }
 
   return (
     <Router>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Sora:wght@800&display=swap');
-        * { box-sizing:border-box; margin:0; padding:0; }
-        body { font-family:'DM Sans','Segoe UI',sans-serif; }
-        input,textarea,select { font-family:inherit; }
-      `}</style>
-      
       <Routes>
         <Route path="/" element={<Landing stats={stats} />} />
         

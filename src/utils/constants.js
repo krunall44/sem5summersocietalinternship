@@ -42,7 +42,11 @@ import {
   setDoc,
   onSnapshot, 
   query, 
-  orderBy 
+  orderBy,
+  deleteDoc,
+  where,
+  getDocs,
+  writeBatch 
 } from "firebase/firestore";
 import { 
   signInWithEmailAndPassword, 
@@ -85,11 +89,46 @@ export async function addComplaintToFirebase(c) {
 export async function patchComplaintInFirebase(id, patch) {
   try {
     // Note: This 'id' must be the Firestore Document ID
-    // We'll need to make sure we're passing the correct doc ID
     const docRef = doc(db, COMPLAINTS_COL, id);
-    await updateDoc(docRef, patch);
+    const finalPatch = { ...patch };
+    if (patch.status === "Resolved") {
+      finalPatch.resolvedAt = new Date().toISOString();
+    }
+    await updateDoc(docRef, finalPatch);
   } catch (e) {
     console.error("Error updating document: ", e);
+  }
+}
+
+export async function deleteResolvedComplaints() {
+  try {
+    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    // Query all resolved complaints (single-field index only)
+    const q = query(
+      collection(db, COMPLAINTS_COL),
+      where("status", "==", "Resolved")
+    );
+    
+    const snapshot = await getDocs(q);
+    if (snapshot.empty) return;
+
+    const batch = writeBatch(db);
+    let count = 0;
+    snapshot.docs.forEach((d) => {
+      const data = d.data();
+      // Filter by timestamp client-side to avoid needing a composite index
+      if (data.resolvedAt && data.resolvedAt <= twentyFourHoursAgo) {
+        batch.delete(d.ref);
+        count++;
+      }
+    });
+
+    if (count > 0) {
+      await batch.commit();
+      console.log(`Deleted ${count} resolved complaints older than 24h.`);
+    }
+  } catch (e) {
+    console.error("Error deleting resolved complaints: ", e);
   }
 }
 

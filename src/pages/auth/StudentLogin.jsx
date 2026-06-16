@@ -1,10 +1,16 @@
-
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { loginUser } from "../../utils/constants";
 import { auth, db } from "../../utils/firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
+
+const UserIcon = () => (
+  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "#60a5fa" }}>
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+    <circle cx="12" cy="7" r="4"/>
+  </svg>
+);
 
 export default function StudentLogin() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -23,16 +29,7 @@ export default function StudentLogin() {
 
     try {
       if (isSignUp) {
-        // Validation for Sign Up
-        if (!email.endsWith(".edu") && !email.includes("college")) {
-           // Basic check for email - you can customize this!
-           // setError("Please use your official email.");
-           // setLoading(false);
-           // return;
-        }
-
         const res = await createUserWithEmailAndPassword(auth, email, password);
-        // Save user profile to Firestore
         await setDoc(doc(db, "users", res.user.uid), {
           name: studentName,
           id: studentId,
@@ -42,7 +39,6 @@ export default function StudentLogin() {
         navigate("/student");
       } else {
         const res = await loginUser(email, password);
-        // Verify role
         const userDoc = await getDoc(doc(db, "users", res.user.uid));
         if (userDoc.exists() && userDoc.data().role === "student") {
           navigate("/student");
@@ -60,32 +56,80 @@ export default function StudentLogin() {
   return (
     <div style={{
       minHeight: "100vh",
-      background: "#0D1B2A",
+      background: "radial-gradient(circle at 50% 50%, #0e1626 0%, #030712 100%)",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      padding: "20px"
+      padding: "24px",
+      position: "relative",
+      overflow: "hidden"
     }}>
+      {/* Decorative Blob */}
       <div style={{
-        background: "#16263A",
-        border: "1px solid #243B55",
-        borderRadius: "20px",
-        padding: "40px",
-        width: "100%",
-        maxWidth: "450px",
-        textAlign: "center"
-      }}>
-        <div style={{ fontSize: "48px", marginBottom: "20px" }}>🎓</div>
-        <h1 style={{ color: "#E0F2FE", fontFamily: "'Sora', sans-serif", marginBottom: "10px" }}>
+        position: "absolute",
+        top: "25%",
+        left: "25%",
+        width: "300px",
+        height: "300px",
+        background: "rgba(59, 130, 246, 0.06)",
+        borderRadius: "50%",
+        filter: "blur(90px)",
+        pointerEvents: "none",
+        zIndex: 0
+      }} />
+
+      <div 
+        className="glass-panel animate-fade-in"
+        style={{
+          padding: "44px 36px",
+          width: "100%",
+          maxWidth: "440px",
+          textAlign: "center",
+          borderRadius: "var(--radius-lg)",
+          position: "relative",
+          zIndex: 1
+        }}
+      >
+        <div style={{ 
+          display: "inline-flex", 
+          padding: "16px", 
+          background: "rgba(59, 130, 246, 0.08)", 
+          borderRadius: "var(--radius-md)", 
+          marginBottom: "24px",
+          border: "1px solid rgba(59, 130, 246, 0.15)"
+        }}>
+          <UserIcon />
+        </div>
+        
+        <h1 style={{ 
+          color: "var(--text-dark-primary)", 
+          fontSize: "24px", 
+          fontWeight: 700,
+          letterSpacing: "-0.5px", 
+          marginBottom: "8px" 
+        }}>
           {isSignUp ? "Student Register" : "Student Login"}
         </h1>
-        <p style={{ color: "#546E7A", marginBottom: "30px" }}>
-          {isSignUp ? "Create an account to submit complaints" : "Enter your credentials to access the portal"}
+        <p style={{ color: "var(--text-dark-secondary)", fontSize: "14px", marginBottom: "32px", opacity: 0.8 }}>
+          {isSignUp ? "Create your credentials to submit complaints" : "Enter credentials to access your student desk"}
         </p>
         
-        {error && <div style={{ color: "#F44336", marginBottom: "20px", fontSize: "13px" }}>{error}</div>}
+        {error && (
+          <div style={{ 
+            color: "#ef4444", 
+            background: "rgba(239, 68, 68, 0.08)",
+            border: "1px solid rgba(239, 68, 68, 0.15)",
+            padding: "12px",
+            borderRadius: "var(--radius-sm)",
+            marginBottom: "24px", 
+            fontSize: "13px",
+            textAlign: "left"
+          }}>
+            {error}
+          </div>
+        )}
 
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
           {isSignUp && (
             <>
               <input
@@ -93,7 +137,7 @@ export default function StudentLogin() {
                 placeholder="Full Name"
                 value={studentName}
                 onChange={(e) => setStudentName(e.target.value)}
-                style={inputStyle}
+                className="form-input-dark"
                 required
               />
               <input
@@ -101,17 +145,17 @@ export default function StudentLogin() {
                 placeholder="Student ID (e.g. 21BCE001)"
                 value={studentId}
                 onChange={(e) => setStudentId(e.target.value)}
-                style={inputStyle}
+                className="form-input-dark"
                 required
               />
             </>
           )}
           <input
             type="email"
-            placeholder="Email"
+            placeholder="Email Address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            style={inputStyle}
+            className="form-input-dark"
             required
           />
           <input
@@ -119,48 +163,65 @@ export default function StudentLogin() {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            style={inputStyle}
+            className="form-input-dark"
             required
           />
-          <button type="submit" disabled={loading} style={{
-            ...buttonStyle,
-            opacity: loading ? 0.7 : 1,
-            cursor: loading ? "not-allowed" : "pointer"
-          }}>
+          
+          <button 
+            type="submit" 
+            disabled={loading} 
+            className="btn-primary-dark"
+            style={{
+              opacity: loading ? 0.7 : 1,
+              cursor: loading ? "not-allowed" : "pointer",
+              marginTop: "8px",
+              width: "100%"
+            }}
+          >
             {loading ? "Processing..." : (isSignUp ? "Register" : "Login")}
           </button>
         </form>
         
         <button 
-          onClick={() => setIsSignUp(!isSignUp)}
-          style={{ background: "none", border: "none", color: "#4FC3F7", marginTop: "20px", cursor: "pointer", fontSize: "14px" }}
+          onClick={() => {
+            setIsSignUp(!isSignUp);
+            setError("");
+          }}
+          style={{ 
+            display: "block",
+            margin: "24px auto 0",
+            background: "none", 
+            border: "none", 
+            color: "#60a5fa", 
+            cursor: "pointer", 
+            fontSize: "14px",
+            fontWeight: 500,
+            transition: "color var(--transition-fast)"
+          }}
+          onMouseOver={(e) => e.target.style.color = "#3b82f6"}
+          onMouseOut={(e) => e.target.style.color = "#60a5fa"}
         >
           {isSignUp ? "Already have an account? Login" : "Don't have an account? Register"}
         </button>
 
-        <Link to="/" style={{ color: "#78909C", display: "block", marginTop: "15px", textDecoration: "none", fontSize: "13px" }}>
-          ← Back to Selection
+        <Link 
+          to="/" 
+          style={{ 
+            display: "block",
+            margin: "16px auto 0",
+            color: "var(--text-dark-secondary)", 
+            textDecoration: "none", 
+            fontSize: "13px",
+            opacity: 0.7,
+            width: "fit-content",
+            transition: "opacity var(--transition-fast)"
+          }}
+          onMouseOver={(e) => e.target.style.opacity = "1"}
+          onMouseOut={(e) => e.target.style.opacity = "0.7"}
+        >
+          ← Back to selection
         </Link>
       </div>
     </div>
   );
 }
-
-const inputStyle = {
-  padding: "14px",
-  borderRadius: "10px",
-  border: "1.5px solid #243B55",
-  background: "#0D1B2A",
-  color: "white",
-  outline: "none"
-};
-
-const buttonStyle = {
-  padding: "14px",
-  background: "linear-gradient(135deg, #1565C0, #0288D1)",
-  color: "white",
-  border: "none",
-  borderRadius: "10px",
-  fontWeight: 700,
-  marginTop: "10px"
-};
