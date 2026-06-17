@@ -102,6 +102,7 @@ export default function App() {
           element={
             <ProtectedRoute allowedRole="student" user={user}>
               <StudentPortal 
+                user={user}
                 complaints={complaints} 
                 addComplaint={addComplaintToFirebase} 
                 patchComplaint={patchComplaintInFirebase} 

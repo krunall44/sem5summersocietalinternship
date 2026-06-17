@@ -52,10 +52,10 @@ const EmptyIcon = () => (
   </svg>
 );
 
-export default function StudentPortal({ complaints, addComplaint, patchComplaint }) {
+export default function StudentPortal({ user, complaints, addComplaint, patchComplaint }) {
   const [tab, setTab] = useState("new");
   const [form, setForm] = useState({
-    studentName: "",
+    studentName: user?.name || "",
     room: "",
     category: "",
     title: "",
@@ -115,6 +115,7 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
 
     const newC = {
       id: genId(),
+      userId: user?.uid || "anonymous",
       studentName: studentName.trim(),
       room: room.trim(),
       category,
@@ -135,7 +136,7 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
     addComplaint(newC);
     setSuccess("Complaint submitted! ID: " + newC.id);
     setForm({
-      studentName: "",
+      studentName: user?.name || "",
       room: "",
       category: "",
       title: "",
@@ -167,10 +168,11 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
 
   const myList = complaints.filter(
     (c) =>
-      c.studentName.toLowerCase().includes(search.toLowerCase()) ||
+      (c.userId === user?.uid) &&
+      (c.studentName.toLowerCase().includes(search.toLowerCase()) ||
       c.room.toLowerCase().includes(search.toLowerCase()) ||
       c.id.toLowerCase().includes(search.toLowerCase()) ||
-      c.title.toLowerCase().includes(search.toLowerCase())
+      c.title.toLowerCase().includes(search.toLowerCase()))
   );
 
   return (
