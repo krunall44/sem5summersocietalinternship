@@ -188,7 +188,7 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
 
   return (
     <div
-      style={{ minHeight: "100vh", background: "var(--bg-secondary)", color: "var(--text-primary)" }}
+      style={{ minHeight: "100vh", background: "var(--bg-secondary)", color: "var(--text-primary)", overflowX: "hidden" }}
       className="animate-fade-in"
     >
       <style>{`

@@ -71,7 +71,7 @@ export default function Landing({ stats }) {
         justifyContent: "center",
         padding: "40px 24px",
         position: "relative",
-        overflow: "hidden",
+        overflowX: "hidden",
         transition: "background var(--transition-normal)"
       }}
     >
