@@ -735,7 +735,7 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                         }}
                         style={{
                           background: sel.status === s ? STATUS_META[s].dot : "var(--card-glass)",
-                          color: "white",
+                          color: sel.status === s ? "white" : "var(--text-primary)",
                           border: `1px solid ${sel.status === s ? STATUS_META[s].dot : "var(--border-color)"}`,
                           padding: "8px 14px",
                           borderRadius: "var(--radius-sm)",
