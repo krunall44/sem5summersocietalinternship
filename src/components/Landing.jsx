@@ -193,7 +193,7 @@ export default function Landing({ stats }) {
           flexWrap: "wrap",
           justifyContent: "center",
           width: "100%",
-          maxWidth: "760px",
+          padding: "0 16px",
           marginBottom: "56px",
           position: "relative",
           zIndex: 1
@@ -216,7 +216,7 @@ export default function Landing({ stats }) {
             to: "/login/management",
           },
         ].map((p, idx) => (
-          <Link key={p.to} to={p.to} className="portal-card glass-panel glass-panel-hover" style={{ animationDelay: `${idx * 0.1}s` }}>
+          <Link key={p.to} to={p.to} className="portal-card glass-panel glass-panel-hover" style={{ animationDelay: `${idx * 0.1}s`, flex: "1 1 300px", maxWidth: "400px" }}>
             <div className="icon-wrapper">
               {p.icon}
             </div>
@@ -265,10 +265,11 @@ export default function Landing({ stats }) {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
           gap: "16px",
           width: "100%",
-          maxWidth: "680px",
+          padding: "0 16px",
+          maxWidth: "800px",
           position: "relative",
           zIndex: 1,
         }}

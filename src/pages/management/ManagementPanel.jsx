@@ -489,12 +489,12 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
             </div>
 
             {/* Dashboard Content split layout */}
-            <div style={{ display: "flex", gap: "24px", alignItems: "flex-start" }}>
-              
+            <div style={{ display: "flex", gap: "24px", alignItems: "flex-start", flexWrap: "wrap" }}>
+
               {/* LEFT: Complaint Directory */}
               <div 
                 className={`full-width-mobile ${sel ? "hide-on-mobile" : ""}`}
-                style={{ flex: "1 1 480px" }}
+                style={{ flex: "1 1 300px", width: "100%" }}
               >
                 <div style={{ position: "relative", marginBottom: "16px" }}>
                   <input
@@ -663,7 +663,7 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
               {/* RIGHT: Detail Inspector */}
               <div 
                 className={`full-width-mobile ${!sel ? "hide-on-mobile" : ""}`}
-                style={{ flex: "1 1 540px", position: "sticky", top: "100px" }}
+                style={{ flex: "1 1 300px", width: "100%", position: "sticky", top: "100px" }}
               >
                 {!sel ? (
                   <div
