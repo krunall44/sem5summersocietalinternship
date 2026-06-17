@@ -1,7 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import ThemeToggle from "./ThemeToggle";
 
-// Premium Custom SVG Icons
+// ... (keep icons as they are)
 const LogoIcon = () => (
   <svg width="44" height="44" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M3 9.5L12 4L21 9.5V19.5C21 20.0523 20.5523 20.5 20 20.5H4C3.44772 20.5 3 20.0523 3 19.5V9.5Z" stroke="url(#logo-grad)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -63,16 +64,22 @@ export default function Landing({ stats }) {
     <div
       style={{
         minHeight: "100vh",
-        background: "radial-gradient(circle at 50% 50%, #0e1626 0%, #030712 100%)",
+        background: "var(--bg-radial)",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
         padding: "40px 24px",
         position: "relative",
-        overflow: "hidden"
+        overflow: "hidden",
+        transition: "background var(--transition-normal)"
       }}
     >
+      {/* Theme Toggle Positioned Top-Right */}
+      <div style={{ position: "absolute", top: "24px", right: "24px", zIndex: 100 }}>
+        <ThemeToggle />
+      </div>
+
       {/* Dynamic Background Blur Blobs */}
       <div style={{
         position: "absolute",
@@ -80,7 +87,7 @@ export default function Landing({ stats }) {
         left: "10%",
         width: "350px",
         height: "350px",
-        background: "rgba(59, 130, 246, 0.08)",
+        background: "var(--primary-glow)",
         borderRadius: "50%",
         filter: "blur(100px)",
         pointerEvents: "none",
@@ -110,28 +117,29 @@ export default function Landing({ stats }) {
           text-decoration: none;
           padding: 40px 30px;
           border-radius: var(--radius-lg);
+          background: var(--card-glass);
         }
         .portal-card .icon-wrapper {
           padding: 18px;
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.05);
+          background: rgba(156, 163, 175, 0.05);
+          border: 1px solid var(--border-color);
           border-radius: var(--radius-md);
-          color: var(--text-dark-secondary);
+          color: var(--text-secondary);
           margin-bottom: 24px;
           transition: all var(--transition-normal);
         }
         .portal-card:hover .icon-wrapper {
-          color: #60a5fa;
-          background: rgba(59, 130, 246, 0.08);
-          border-color: rgba(59, 130, 246, 0.2);
-          box-shadow: 0 0 20px rgba(59, 130, 246, 0.1);
+          color: var(--primary-color);
+          background: var(--primary-glow);
+          border-color: var(--primary-color);
+          box-shadow: 0 0 20px var(--primary-glow);
         }
         .portal-card .card-btn {
           width: 100%;
           padding: 12px;
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.06);
-          color: var(--text-dark-secondary);
+          background: rgba(156, 163, 175, 0.05);
+          border: 1px solid var(--border-color);
+          color: var(--text-secondary);
           border-radius: var(--radius-md);
           font-size: 13px;
           font-weight: 600;
@@ -140,17 +148,19 @@ export default function Landing({ stats }) {
           margin-top: auto;
         }
         .portal-card:hover .card-btn {
-          background: var(--primary-dark);
-          border-color: var(--primary-dark);
+          background: var(--primary-color);
+          border-color: var(--primary-color);
           color: white;
-          box-shadow: 0 4px 15px rgba(59, 130, 246, 0.25);
+          box-shadow: 0 4px 15px var(--primary-glow);
         }
         .stat-glow {
           transition: all var(--transition-normal);
+          background: var(--card-glass);
+          border: 1px solid var(--border-color);
         }
         .stat-glow:hover {
-          background: rgba(255, 255, 255, 0.02) !important;
-          border-color: rgba(255, 255, 255, 0.08) !important;
+          background: var(--card-glass-hover) !important;
+          border-color: var(--primary-color) !important;
         }
       `}</style>
 
@@ -161,7 +171,7 @@ export default function Landing({ stats }) {
         </div>
         <h1
           style={{
-            color: "var(--text-dark-primary)",
+            color: "var(--text-primary)",
             fontSize: "clamp(28px, 6vw, 42px)",
             fontWeight: 800,
             letterSpacing: "-0.5px",
@@ -170,7 +180,7 @@ export default function Landing({ stats }) {
         >
           HostelDesk
         </h1>
-        <p style={{ color: "var(--text-dark-secondary)", fontSize: "14px", fontWeight: 400, opacity: 0.85 }}>
+        <p style={{ color: "var(--text-secondary)", fontSize: "14px", fontWeight: 400, opacity: 0.85 }}>
           Smart Hostel Complaint & Maintenance Hub
         </p>
       </div>
@@ -212,8 +222,8 @@ export default function Landing({ stats }) {
             </div>
             <span
               style={{
-                background: "rgba(59, 130, 246, 0.08)",
-                color: "#60a5fa",
+                background: "var(--primary-glow)",
+                color: "var(--primary-color)",
                 fontSize: "10px",
                 padding: "4px 12px",
                 borderRadius: "20px",
@@ -225,7 +235,7 @@ export default function Landing({ stats }) {
             </span>
             <h2
               style={{
-                color: "var(--text-dark-primary)",
+                color: "var(--text-primary)",
                 fontSize: "20px",
                 fontWeight: 700,
                 margin: "16px 0 8px",
@@ -235,7 +245,7 @@ export default function Landing({ stats }) {
             </h2>
             <p
               style={{
-                color: "var(--text-dark-secondary)",
+                color: "var(--text-secondary)",
                 fontSize: "13.5px",
                 lineHeight: 1.6,
                 marginBottom: "28px",
@@ -275,8 +285,6 @@ export default function Landing({ stats }) {
             className="stat-glow"
             style={{ 
               textAlign: "center", 
-              background: "rgba(255, 255, 255, 0.01)", 
-              border: "1px solid rgba(255, 255, 255, 0.03)", 
               borderRadius: "var(--radius-md)", 
               padding: "16px 12px",
               display: "flex",
@@ -287,7 +295,7 @@ export default function Landing({ stats }) {
             <div style={{ color: item.color, marginBottom: "8px", opacity: 0.9 }}>{item.icon}</div>
             <div
               style={{
-                color: "var(--text-dark-primary)",
+                color: "var(--text-primary)",
                 fontSize: "24px",
                 fontWeight: 800,
                 lineHeight: 1
@@ -296,7 +304,7 @@ export default function Landing({ stats }) {
               {item.val}
             </div>
             <div
-              style={{ color: "var(--text-dark-secondary)", fontSize: "11px", marginTop: "6px", opacity: 0.6 }}
+              style={{ color: "var(--text-secondary)", fontSize: "11px", marginTop: "6px", opacity: 0.6 }}
             >
               {item.label}
             </div>
@@ -306,7 +314,7 @@ export default function Landing({ stats }) {
 
       <p
         style={{
-          color: "var(--text-dark-muted)",
+          color: "var(--text-muted)",
           marginTop: "64px",
           fontSize: "11px",
           textAlign: "center",

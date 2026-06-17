@@ -1,6 +1,7 @@
 
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import ThemeToggle from "../../components/ThemeToggle";
 import { 
   CATEGORIES, 
   PRIORITIES, 
@@ -173,7 +174,7 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
   );
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--bg-light)" }} className="animate-fade-in">
+    <div style={{ minHeight: "100vh", background: "var(--bg-secondary)" }} className="animate-fade-in">
       <style>{`
         .segment-tab {
           padding: 10px 16px;
@@ -190,45 +191,45 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
           gap: 6px;
         }
         .segment-tab.active {
-          background: white;
-          color: var(--text-light-primary);
+          background: var(--card-bg);
+          color: var(--text-primary);
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
         .segment-tab:not(.active) {
           background: transparent;
-          color: var(--text-light-secondary);
+          color: var(--text-secondary);
           opacity: 0.8;
         }
         .segment-tab:not(.active):hover {
-          color: var(--text-light-primary);
+          color: var(--text-primary);
           opacity: 1;
         }
-        .portal-card-light {
-          background: white;
+        .portal-card-themed {
+          background: var(--card-bg);
           border-radius: var(--radius-lg);
           padding: 28px 24px;
           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-          border: 1px solid var(--border-light);
+          border: 1px solid var(--border-color);
         }
         .complaint-item {
-          background: white;
+          background: var(--card-bg);
           border-radius: var(--radius-md);
           padding: 20px;
           margin-bottom: 12px;
           box-shadow: 0 2px 10px rgba(0,0,0,0.02);
-          border: 1px solid var(--border-light);
+          border: 1px solid var(--border-color);
           cursor: pointer;
           transition: all var(--transition-fast);
         }
         .complaint-item:hover {
           transform: translateY(-2px);
           box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-          border-color: #cbd5e1;
+          border-color: var(--primary-color);
         }
         .input-label {
           font-size: 12px;
           font-weight: 700;
-          color: var(--text-light-secondary);
+          color: var(--text-secondary);
           letter-spacing: 0.5px;
           text-transform: uppercase;
           margin-bottom: 6px;
@@ -239,8 +240,8 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
       {/* Header */}
       <div
         style={{
-          background: "white",
-          borderBottom: "1px solid var(--border-light)",
+          background: "var(--card-bg)",
+          borderBottom: "1px solid var(--border-color)",
           padding: "18px 24px",
           position: "sticky",
           top: 0,
@@ -260,7 +261,7 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
             <div
               style={{
                 fontSize: "10px",
-                color: "var(--text-light-muted)",
+                color: "var(--text-muted)",
                 letterSpacing: "1px",
                 fontWeight: 700,
                 marginBottom: "2px",
@@ -272,19 +273,20 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
               style={{
                 fontSize: "18px",
                 fontWeight: 800,
-                color: "var(--text-light-primary)",
+                color: "var(--text-primary)",
                 letterSpacing: "-0.3px"
               }}
             >
               Student Portal
             </h1>
           </div>
-          <div style={{ display: "flex", gap: "10px" }}>
+          <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+            <ThemeToggle />
             <Link
               to="/"
               style={{
-                background: "rgba(0, 0, 0, 0.04)",
-                color: "var(--text-light-primary)",
+                background: "rgba(156, 163, 175, 0.1)",
+                color: "var(--text-primary)",
                 textDecoration: "none",
                 padding: "8px 14px",
                 borderRadius: "var(--radius-sm)",
@@ -294,8 +296,8 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
                 alignItems: "center",
                 transition: "background var(--transition-fast)"
               }}
-              onMouseOver={(e) => e.target.style.background = "rgba(0, 0, 0, 0.07)"}
-              onMouseOut={(e) => e.target.style.background = "rgba(0, 0, 0, 0.04)"}
+              onMouseOver={(e) => e.target.style.background = "rgba(156, 163, 175, 0.2)"}
+              onMouseOut={(e) => e.target.style.background = "rgba(156, 163, 175, 0.1)"}
             >
               <BackIcon />
               Back
@@ -335,7 +337,7 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
         <div
           style={{
             display: "flex",
-            background: "rgba(0, 0, 0, 0.04)",
+            background: "rgba(156, 163, 175, 0.1)",
             padding: "4px",
             borderRadius: "12px",
             marginBottom: "28px",
@@ -360,11 +362,11 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
         </div>
 
         {tab === "new" && (
-          <div className="portal-card-light">
+          <div className="portal-card-themed">
             <h2
               style={{
                 margin: "0 0 24px",
-                color: "var(--text-light-primary)",
+                color: "var(--text-primary)",
                 fontSize: "18px",
                 fontWeight: 700
               }}
@@ -419,7 +421,7 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
                 <div>
                   <label className="input-label">Your Name</label>
                   <input
-                    className="form-input-light"
+                    className="form-input"
                     placeholder="e.g. Rahul Sharma"
                     value={form.studentName}
                     onChange={(e) => setField("studentName", e.target.value)}
@@ -429,7 +431,7 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
                 <div>
                   <label className="input-label">Room Number</label>
                   <input
-                    className="form-input-light"
+                    className="form-input"
                     placeholder="e.g. A-204"
                     value={form.room}
                     onChange={(e) => setField("room", e.target.value)}
@@ -449,7 +451,7 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
                 <div>
                   <label className="input-label">Category</label>
                   <select
-                    className="form-input-light"
+                    className="form-input"
                     value={form.category}
                     onChange={(e) => setField("category", e.target.value)}
                     required
@@ -464,7 +466,7 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
                 <div>
                   <label className="input-label">Priority</label>
                   <select
-                    className="form-input-light"
+                    className="form-input"
                     value={form.priority}
                     onChange={(e) => setField("priority", e.target.value)}
                     required
@@ -480,7 +482,7 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
               <div>
                 <label className="input-label">Complaint Title</label>
                 <input
-                  className="form-input-light"
+                  className="form-input"
                   placeholder="Brief title of the issue"
                   value={form.title}
                   onChange={(e) => setField("title", e.target.value)}
@@ -493,7 +495,7 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
                   Description
                 </label>
                 <textarea
-                  className="form-input-light"
+                  className="form-input"
                   placeholder="Describe the problem in detail (minimum 20 characters for AI advice)…"
                   rows={4}
                   value={form.description}
@@ -507,8 +509,8 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
               {(aiLoading || aiHint) && (
                 <div
                   style={{
-                    background: "rgba(37, 99, 235, 0.04)",
-                    border: "1px solid rgba(37, 99, 235, 0.12)",
+                    background: "var(--primary-glow)",
+                    border: "1px solid var(--border-color)",
                     borderRadius: "var(--radius-md)",
                     padding: "16px",
                     display: "flex",
@@ -521,8 +523,8 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
                       <div style={{
                         width: "18px",
                         height: "18px",
-                        border: "2px solid rgba(37, 99, 235, 0.1)",
-                        borderTopColor: "#2563eb",
+                        border: "2px solid var(--border-color)",
+                        borderTopColor: "var(--primary-color)",
                         borderRadius: "50%",
                       }} className="animate-spin" />
                     ) : (
@@ -533,7 +535,7 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
                     <div
                       style={{
                         fontWeight: 700,
-                        color: "#2563eb",
+                        color: "var(--primary-color)",
                         fontSize: "11px",
                         letterSpacing: "0.5px",
                         textTransform: "uppercase",
@@ -542,7 +544,7 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
                     >
                       AI Assistant advice
                     </div>
-                    <div style={{ color: "var(--text-light-secondary)", fontSize: "13px", lineHeight: 1.5 }}>
+                    <div style={{ color: "var(--text-secondary)", fontSize: "13px", lineHeight: 1.5 }}>
                       {aiLoading ? "Analyzing description details..." : aiHint}
                     </div>
                   </div>
@@ -552,7 +554,7 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
               <button
                 type="submit"
                 disabled={busy}
-                className="btn-primary-light"
+                className="btn-primary"
                 style={{
                   padding: "14px",
                   cursor: busy ? "not-allowed" : "pointer",
@@ -570,7 +572,7 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
           <div>
             <div style={{ position: "relative", marginBottom: "20px" }}>
               <input
-                className="form-input-light"
+                className="form-input"
                 placeholder="Search by ID, title, room or description..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -585,11 +587,11 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
               <div
                 style={{
                   textAlign: "center",
-                  color: "var(--text-light-muted)",
+                  color: "var(--text-muted)",
                   padding: "64px 0",
-                  background: "white",
+                  background: "var(--card-bg)",
                   borderRadius: "var(--radius-lg)",
-                  border: "1px solid var(--border-light)",
+                  border: "1px solid var(--border-color)",
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
@@ -609,7 +611,7 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
                 <div
                   key={c.id}
                   className="complaint-item"
-                  style={{ borderLeft: `4px solid ${PRIORITY_COLOR[c.priority] || "#e2e8f0"}` }}
+                  style={{ borderLeft: `4px solid ${PRIORITY_COLOR[c.priority] || "var(--border-color)"}` }}
                   onClick={() => setExpanded(isSelected ? null : c.id)}
                 >
                   <div
@@ -624,7 +626,7 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
                       <div
                         style={{
                           fontWeight: 700,
-                          color: "var(--text-light-primary)",
+                          color: "var(--text-primary)",
                           fontSize: "15px",
                           lineHeight: 1.4,
                           marginBottom: "4px"
@@ -634,14 +636,14 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
                       </div>
                       <div
                         style={{
-                          color: "var(--text-light-secondary)",
+                          color: "var(--text-secondary)",
                           fontSize: "12.5px",
                           display: "flex",
                           flexWrap: "wrap",
                           gap: "6px 12px",
                         }}
                       >
-                        <span>ID: <strong style={{ color: "var(--text-light-primary)" }}>{c.id}</strong></span>
+                        <span>ID: <strong style={{ color: "var(--text-primary)" }}>{c.id}</strong></span>
                         <span>•</span>
                         <span>{c.category}</span>
                         <span>•</span>
@@ -649,7 +651,7 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
                       </div>
                       <div
                         style={{
-                          color: "var(--text-light-muted)",
+                          color: "var(--text-muted)",
                           fontSize: "11px",
                           marginTop: "6px",
                         }}
@@ -692,7 +694,7 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
                       style={{
                         marginTop: "16px",
                         paddingTop: "16px",
-                        borderTop: "1px solid var(--border-light)",
+                        borderTop: "1px solid var(--border-color)",
                         animation: "fadeIn 0.2s ease forwards"
                       }}
                       onClick={(e) => e.stopPropagation()} // Stop propagation to avoid closing card
@@ -701,7 +703,7 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
                         <span className="input-label" style={{ marginBottom: "4px" }}>Detailed Description</span>
                         <p
                           style={{
-                            color: "var(--text-light-secondary)",
+                            color: "var(--text-secondary)",
                             fontSize: "13.5px",
                             lineHeight: 1.6,
                             whiteSpace: "pre-wrap"
@@ -715,12 +717,12 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
                         <div
                           style={{
                             fontSize: "13px",
-                            color: "var(--text-light-primary)",
+                            color: "var(--text-primary)",
                             marginBottom: "16px",
                             padding: "10px 14px",
-                            background: "rgba(59, 130, 246, 0.05)",
+                            background: "var(--primary-glow)",
                             borderRadius: "var(--radius-sm)",
-                            borderLeft: "3px solid var(--primary-light)",
+                            borderLeft: "3px solid var(--primary-color)",
                             display: "inline-block"
                           }}
                         >
@@ -731,7 +733,7 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
                       <div className="input-label" style={{ marginBottom: "8px" }}>Status updates log</div>
                       
                       {c.updates.length === 0 ? (
-                        <div style={{ color: "var(--text-light-muted)", fontSize: "13px" }}>
+                        <div style={{ color: "var(--text-muted)", fontSize: "13px" }}>
                           No updates logged yet.
                         </div>
                       ) : (
@@ -740,17 +742,17 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
                             <div
                               key={i}
                               style={{
-                                background: "rgba(0, 0, 0, 0.02)",
+                                background: "rgba(156, 163, 175, 0.05)",
                                 borderRadius: "var(--radius-sm)",
                                 padding: "12px 14px",
                                 fontSize: "13px",
-                                borderLeft: "3px solid #94a3b8",
+                                borderLeft: "3px solid var(--text-muted)",
                               }}
                             >
-                              <span style={{ color: "var(--text-light-primary)", fontWeight: 700, marginRight: "8px" }}>
+                              <span style={{ color: "var(--text-primary)", fontWeight: 700, marginRight: "8px" }}>
                                 {fmtDate(u.date)}:
                               </span>{" "}
-                              <span style={{ color: "var(--text-light-secondary)" }}>{u.note}</span>
+                              <span style={{ color: "var(--text-secondary)" }}>{u.note}</span>
                             </div>
                           ))}
                         </div>
@@ -765,4 +767,5 @@ export default function StudentPortal({ complaints, addComplaint, patchComplaint
       </div>
     </div>
   );
+
 }

@@ -67,19 +67,19 @@ export default function App() {
     return (
       <div style={{ 
         minHeight: "100vh", 
-        background: "var(--bg-dark)", 
+        background: "var(--bg-primary)", 
         display: "flex", 
         flexDirection: "column",
         alignItems: "center", 
         justifyContent: "center",
-        color: "var(--text-dark-primary)",
+        color: "var(--text-primary)",
         gap: "16px"
       }}>
         <div style={{
           width: "36px",
           height: "36px",
-          border: "3px solid rgba(59, 130, 246, 0.1)",
-          borderTopColor: "var(--primary-dark)",
+          border: "3px solid var(--border-color)",
+          borderTopColor: "var(--primary-color)",
           borderRadius: "50%",
         }} className="animate-spin" />
         <h2 style={{ fontSize: "16px", fontWeight: 500, letterSpacing: "0.5px" }}>Loading HostelDesk...</h2>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import ThemeToggle from "../../components/ThemeToggle";
 import { 
   STATUSES, 
   STATUS_META, 
@@ -159,85 +160,44 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
 
   return (
     <div
-      style={{ minHeight: "100vh", background: "#0B1120", color: "#E5E7EB" }}
+      style={{ minHeight: "100vh", background: "var(--bg-secondary)", color: "var(--text-primary)" }}
       className="animate-fade-in"
     >
       <style>{`
-        :root { 
-          --border-dark: #1F2937; 
-          --bg-dark: #0B1120; 
-          --text-dark-primary: #F9FAFB; 
-          --text-dark-secondary: #9CA3AF; 
-          --text-dark-muted: #6B7280; 
-          --primary-dark: #3b82f6; 
-          --radius-sm: 6px; 
-          --radius-md: 8px; 
-          --radius-lg: 12px; 
-          --transition-fast: 0.2s; 
-          --transition-normal: 0.3s; 
-        }
-        .form-input-dark { 
-          width: 100%; 
-          padding: 11px 14px; 
-          border: 1px solid var(--border-dark); 
-          border-radius: var(--radius-md); 
-          font-size: 13px; 
-          background: #030712; 
-          color: white; 
-          outline: none; 
-          transition: border .2s; 
-          box-sizing: border-box; 
-        }
-        .form-input-dark:focus { 
-          border-color: var(--primary-dark); 
-        }
-        .btn-primary-dark { 
-          background: var(--primary-dark); 
-          color: white; 
-          border: none; 
-          padding: 10px 16px; 
-          border-radius: var(--radius-sm); 
-          font-size: 13px; 
-          font-weight: 600; 
-          cursor: pointer; 
-          width: 100%;
-          transition: background var(--transition-fast);
-        }
-        .btn-primary-dark:hover {
-          background: #2563eb;
-        }
         .panel-chip { 
           padding: 8px 16px; 
           border-radius: 20px; 
           font-size: 12px; 
           font-weight: 700; 
           cursor: pointer; 
-          border: 1px solid rgba(255, 255, 255, 0.08); 
+          border: 1px solid var(--border-color); 
           transition: all var(--transition-normal); 
           white-space: nowrap; 
+          background: var(--card-glass);
+          color: var(--text-secondary);
         }
         .complaint-row { 
-          background: rgba(255, 255, 255, 0.02); 
+          background: var(--card-glass); 
           border-radius: var(--radius-md); 
           padding: 16px; 
           margin-bottom: 10px; 
-          border: 1px solid var(--border-dark); 
+          border: 1px solid var(--border-color); 
           cursor: pointer; 
           transition: all var(--transition-normal); 
         }
         .complaint-row:hover { 
-          background: rgba(255, 255, 255, 0.04); 
-          border-color: rgba(96, 165, 250, 0.25); 
+          background: var(--card-glass-hover); 
+          border-color: var(--primary-color); 
         }
         .complaint-row.active { 
-          border-color: var(--primary-dark); 
-          background: rgba(59, 130, 246, 0.08); 
-          box-shadow: 0 0 15px rgba(59, 130, 246, 0.1); 
+          border-color: var(--primary-color); 
+          background: var(--primary-glow); 
+          box-shadow: 0 0 15px var(--primary-glow); 
         }
         .panel-label { 
           font-size: 11px; 
           font-weight: 700; 
-          color: var(--text-dark-secondary); 
+          color: var(--text-secondary); 
           letter-spacing: 0.8px; 
           text-transform: uppercase; 
           margin-bottom: 6px; 
@@ -245,19 +205,24 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
           opacity: 0.75; 
         }
         .metric-card { 
-          background: rgba(255, 255, 255, 0.015); 
-          border: 1px solid var(--border-dark); 
+          background: var(--card-glass); 
+          border: 1px solid var(--border-color); 
           border-radius: var(--radius-md); 
           padding: 16px 20px; 
           flex: 1 1 120px; 
           display: flex; 
           align-items: center; 
           gap: 16px; 
+          transition: all var(--transition-normal);
+        }
+        .metric-card:hover {
+          border-color: var(--primary-color);
+          background: var(--card-glass-hover);
         }
         .ai-badge-btn { 
-          background: rgba(96, 165, 250, 0.08); 
-          color: #60a5fa; 
-          border: 1px solid rgba(96, 165, 250, 0.15); 
+          background: var(--primary-glow); 
+          color: var(--primary-color); 
+          border: 1px solid var(--border-color); 
           font-size: 11px; 
           font-weight: 600; 
           padding: 6px 12px; 
@@ -269,7 +234,7 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
         }
         .ai-badge-btn:hover:not(:disabled) { 
           background: rgba(96, 165, 250, 0.18); 
-          border-color: rgba(96, 165, 250, 0.3); 
+          border-color: var(--primary-color); 
           transform: translateY(-1px); 
         }
         @media (max-width: 768px) { 
@@ -285,13 +250,14 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
       {/* Header */}
       <div
         style={{
-          background: "rgba(3, 7, 18, 0.6)",
+          background: "var(--card-bg)",
           backdropFilter: "blur(12px)",
-          borderBottom: "1px solid var(--border-dark)",
+          borderBottom: "1px solid var(--border-color)",
           padding: "18px 24px",
           position: "sticky",
           top: 0,
-          zIndex: 10
+          zIndex: 10,
+          transition: "background var(--transition-normal)"
         }}
       >
         <div
@@ -307,7 +273,7 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
             <div
               style={{
                 fontSize: "10px",
-                color: "var(--text-dark-muted)",
+                color: "var(--text-muted)",
                 letterSpacing: "1.2px",
                 fontWeight: 700,
                 marginBottom: "2px",
@@ -318,7 +284,7 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
             <h1
               style={{
                 fontSize: "18px",
-                color: "var(--text-dark-primary)",
+                color: "var(--text-primary)",
                 fontWeight: 800,
                 letterSpacing: "-0.3px"
               }}
@@ -326,13 +292,14 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
               Management Console
             </h1>
           </div>
-          <div style={{ display: "flex", gap: "10px" }}>
+          <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+            <ThemeToggle />
             <Link
               to="/"
               style={{
-                background: "rgba(255, 255, 255, 0.03)",
-                color: "var(--text-dark-secondary)",
-                border: "1px solid var(--border-dark)",
+                background: "rgba(156, 163, 175, 0.1)",
+                color: "var(--text-secondary)",
+                border: "1px solid var(--border-color)",
                 padding: "8px 14px",
                 borderRadius: "var(--radius-sm)",
                 textDecoration: "none",
@@ -399,12 +366,12 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                     fontSize: "22px",
                     fontWeight: 800,
                     lineHeight: 1.1,
-                    color: "var(--text-dark-primary)"
+                    color: "var(--text-primary)"
                   }}
                 >
                   {item.val}
                 </div>
-                <div style={{ color: "var(--text-dark-secondary)", fontSize: "12px", marginTop: "3px", opacity: 0.7 }}>{item.label}</div>
+                <div style={{ color: "var(--text-secondary)", fontSize: "12px", marginTop: "3px", opacity: 0.7 }}>{item.label}</div>
               </div>
             </div>
           ))}
@@ -420,7 +387,7 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
           >
             <div style={{ position: "relative", marginBottom: "16px" }}>
               <input
-                className="form-input-dark"
+                className="form-input"
                 placeholder="Search database..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -449,9 +416,9 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                     className="panel-chip"
                     onClick={() => setFilter(s)}
                     style={{
-                      background: active ? "#3b82f6" : "rgba(255, 255, 255, 0.02)",
-                      color: active ? "white" : "var(--text-dark-secondary)",
-                      borderColor: active ? "#3b82f6" : "var(--border-dark)",
+                      background: active ? "var(--primary-color)" : "var(--card-glass)",
+                      color: active ? "white" : "var(--text-secondary)",
+                      borderColor: active ? "var(--primary-color)" : "var(--border-color)",
                     }}
                   >
                     {s}
@@ -469,11 +436,11 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
               <div
                 style={{
                   textAlign: "center",
-                  color: "var(--text-dark-muted)",
+                  color: "var(--text-muted)",
                   padding: "64px 0",
-                  background: "rgba(255,255,255,0.01)",
+                  background: "var(--card-glass)",
                   borderRadius: "var(--radius-lg)",
-                  border: "1px dashed var(--border-dark)"
+                  border: "1px dashed var(--border-color)"
                 }}
               >
                 No database records match this query.
@@ -506,7 +473,7 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                       <div
                         style={{
                           fontWeight: 700,
-                          color: "var(--text-dark-primary)",
+                          color: "var(--text-primary)",
                           fontSize: "14px",
                           whiteSpace: "nowrap",
                           overflow: "hidden",
@@ -518,7 +485,7 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                       </div>
                       <div
                         style={{
-                          color: "var(--text-dark-secondary)",
+                          color: "var(--text-secondary)",
                           fontSize: "12px",
                           display: "flex",
                           gap: "8px",
@@ -567,7 +534,7 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                   
                   <div
                     style={{
-                      color: "var(--text-dark-muted)",
+                      color: "var(--text-muted)",
                       fontSize: "11px",
                       marginTop: "10px",
                       display: "flex",
@@ -590,22 +557,22 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
             {!sel ? (
               <div
                 style={{
-                  background: "rgba(255, 255, 255, 0.01)",
-                  border: "1px dashed var(--border-dark)",
+                  background: "var(--card-glass)",
+                  border: "1px dashed var(--border-color)",
                   borderRadius: "var(--radius-lg)",
                   padding: "80px 24px",
                   textAlign: "center",
                 }}
               >
-                <div style={{ color: "var(--text-dark-muted)", fontSize: "14px" }}>
+                <div style={{ color: "var(--text-muted)", fontSize: "14px" }}>
                   Select a logged ticket from the left panel to inspect details.
                 </div>
               </div>
             ) : (
               <div
                 style={{
-                  background: "rgba(255, 255, 255, 0.02)",
-                  border: "1px solid var(--border-dark)",
+                  background: "var(--card-bg)",
+                  border: "1px solid var(--border-color)",
                   borderRadius: "var(--radius-lg)",
                   padding: "24px",
                 }}
@@ -614,9 +581,9 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                   className="show-only-mobile"
                   onClick={() => setSel(null)}
                   style={{
-                    background: "rgba(255, 255, 255, 0.04)",
-                    color: "var(--text-dark-primary)",
-                    border: "1px solid var(--border-dark)",
+                    background: "var(--card-glass)",
+                    color: "var(--text-primary)",
+                    border: "1px solid var(--border-color)",
                     padding: "8px 12px",
                     borderRadius: "var(--radius-sm)",
                     fontSize: "13px",
@@ -645,7 +612,7 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                     <h2
                       style={{
                         fontSize: "18px",
-                        color: "var(--text-dark-primary)",
+                        color: "var(--text-primary)",
                         fontWeight: 700,
                         lineHeight: 1.3,
                       }}
@@ -654,7 +621,7 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                     </h2>
                     <div
                       style={{
-                        color: "var(--text-dark-muted)",
+                        color: "var(--text-muted)",
                         fontSize: "12px",
                         marginTop: "4px",
                       }}
@@ -666,7 +633,7 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                     onClick={() => setSel(null)}
                     style={{
                       background: "none",
-                      color: "var(--text-dark-muted)",
+                      color: "var(--text-muted)",
                       border: "none",
                       cursor: "pointer",
                       display: "flex",
@@ -684,8 +651,8 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                     gridTemplateColumns: "repeat(auto-fit, minmax(110px, 1fr))",
                     gap: "14px",
                     marginBottom: "20px",
-                    background: "rgba(255, 255, 255, 0.01)",
-                    border: "1px solid var(--border-dark)",
+                    background: "rgba(156, 163, 175, 0.05)",
+                    border: "1px solid var(--border-color)",
                     borderRadius: "var(--radius-md)",
                     padding: "16px",
                   }}
@@ -700,7 +667,7 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                       <span className="panel-label" style={{ fontSize: "10px" }}>{k}</span>
                       <div
                         style={{
-                          color: "var(--text-dark-primary)",
+                          color: "var(--text-primary)",
                           fontSize: "13px",
                           fontWeight: 600,
                         }}
@@ -715,13 +682,13 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                   <span className="panel-label">Student Statement</span>
                   <div
                     style={{
-                      background: "rgba(3, 7, 18, 0.4)",
+                      background: "var(--input-bg)",
                       borderRadius: "var(--radius-md)",
                       padding: "14px",
-                      color: "var(--text-dark-secondary)",
+                      color: "var(--text-secondary)",
                       fontSize: "13.5px",
                       lineHeight: 1.6,
-                      border: "1px solid var(--border-dark)"
+                      border: "1px solid var(--border-color)"
                     }}
                   >
                     {sel.description}
@@ -744,9 +711,9 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                           changeStatus(sel.id, s);
                         }}
                         style={{
-                          background: sel.status === s ? STATUS_META[s].dot : "rgba(255,255,255,0.02)",
+                          background: sel.status === s ? STATUS_META[s].dot : "var(--card-glass)",
                           color: "white",
-                          border: `1px solid ${sel.status === s ? STATUS_META[s].dot : "var(--border-dark)"}`,
+                          border: `1px solid ${sel.status === s ? STATUS_META[s].dot : "var(--border-color)"}`,
                           padding: "8px 14px",
                           borderRadius: "var(--radius-sm)",
                           fontSize: "12.5px",
@@ -763,7 +730,7 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                 <div style={{ marginBottom: "20px" }}>
                   <span className="panel-label">Assign Technician</span>
                   <input
-                    className="form-input-dark"
+                    className="form-input"
                     placeholder="e.g. Electrician, Carpenter, Plumbing Team..."
                     value={assignTo}
                     onChange={(e) => setAssignTo(e.target.value)}
@@ -772,7 +739,7 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                     <div
                       style={{
                         fontSize: "12px",
-                        color: "#60a5fa",
+                        color: "var(--primary-color)",
                         marginTop: "6px",
                       }}
                     >
@@ -814,7 +781,7 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                   </div>
                   
                   <textarea
-                    className="form-input-dark"
+                    className="form-input"
                     placeholder="Provide comments or logs for the student..."
                     rows={3}
                     value={note}
@@ -825,18 +792,18 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                   {aiPanel && (
                     <div
                       style={{
-                        background: "rgba(96, 165, 250, 0.03)",
-                        border: "1px solid rgba(96, 165, 250, 0.12)",
+                        background: "var(--primary-glow)",
+                        border: "1px solid var(--border-color)",
                         borderRadius: "var(--radius-md)",
                         padding: "14px",
                         marginTop: "12px",
                         fontSize: "13px",
-                        color: "#90caf9",
+                        color: "var(--text-secondary)",
                         lineHeight: 1.6,
                         whiteSpace: "pre-wrap",
                       }}
                     >
-                      <div style={{ fontSize: "11px", textTransform: "uppercase", fontWeight: 700, color: "#60a5fa", marginBottom: "4px" }}>
+                      <div style={{ fontSize: "11px", textTransform: "uppercase", fontWeight: 700, color: "var(--primary-color)", marginBottom: "4px" }}>
                         AI Generated Suggestion
                       </div>
                       {aiPanel}
@@ -844,10 +811,11 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                   )}
                   
                   <button
-                    className="btn-primary-dark"
+                    className="btn-primary"
                     onClick={postUpdate}
                     style={{
                       marginTop: "12px",
+                      width: "100%"
                     }}
                   >
                     Post Progress Log
@@ -857,7 +825,7 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                 <div>
                   <span className="panel-label">History Logs ({sel.updates.length})</span>
                   {sel.updates.length === 0 ? (
-                    <div style={{ color: "var(--text-dark-muted)", fontSize: "13px" }}>
+                    <div style={{ color: "var(--text-muted)", fontSize: "13px" }}>
                       No activity logs created.
                     </div>
                   ) : (
@@ -866,20 +834,20 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                         <div
                           key={i}
                           style={{
-                            background: "rgba(255, 255, 255, 0.01)",
+                            background: "rgba(156, 163, 175, 0.05)",
                             borderRadius: "var(--radius-sm)",
                             padding: "10px 14px",
                             fontSize: "13px",
-                            border: "1px solid var(--border-dark)",
-                            borderLeft: "2.5px solid var(--primary-dark)"
+                            border: "1px solid var(--border-color)",
+                            borderLeft: "2.5px solid var(--primary-color)"
                           }}
                         >
                           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
-                            <span style={{ color: "#60a5fa", fontWeight: 700 }}>
+                            <span style={{ color: "var(--primary-color)", fontWeight: 700 }}>
                               {fmtDate(u.date)}
                             </span>
                           </div>
-                          <p style={{ color: "var(--text-dark-secondary)", lineHeight: 1.5 }}>{u.note}</p>
+                          <p style={{ color: "var(--text-secondary)", lineHeight: 1.5 }}>{u.note}</p>
                         </div>
                       ))}
                     </div>

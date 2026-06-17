@@ -4,9 +4,10 @@ import { loginUser } from "../../utils/constants";
 import { auth, db } from "../../utils/firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
+import ThemeToggle from "../../components/ThemeToggle";
 
 const UserIcon = () => (
-  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "#60a5fa" }}>
+  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--primary-color)" }}>
     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
     <circle cx="12" cy="7" r="4"/>
   </svg>
@@ -56,14 +57,20 @@ export default function StudentLogin() {
   return (
     <div style={{
       minHeight: "100vh",
-      background: "radial-gradient(circle at 50% 50%, #0e1626 0%, #030712 100%)",
+      background: "var(--bg-radial)",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
       padding: "24px",
       position: "relative",
-      overflow: "hidden"
+      overflow: "hidden",
+      transition: "background var(--transition-normal)"
     }}>
+      {/* Theme Toggle Positioned Top-Right */}
+      <div style={{ position: "absolute", top: "24px", right: "24px", zIndex: 100 }}>
+        <ThemeToggle />
+      </div>
+
       {/* Decorative Blob */}
       <div style={{
         position: "absolute",
@@ -71,7 +78,7 @@ export default function StudentLogin() {
         left: "25%",
         width: "300px",
         height: "300px",
-        background: "rgba(59, 130, 246, 0.06)",
+        background: "var(--primary-glow)",
         borderRadius: "50%",
         filter: "blur(90px)",
         pointerEvents: "none",
@@ -93,16 +100,16 @@ export default function StudentLogin() {
         <div style={{ 
           display: "inline-flex", 
           padding: "16px", 
-          background: "rgba(59, 130, 246, 0.08)", 
+          background: "var(--primary-glow)", 
           borderRadius: "var(--radius-md)", 
           marginBottom: "24px",
-          border: "1px solid rgba(59, 130, 246, 0.15)"
+          border: "1px solid var(--border-color)"
         }}>
           <UserIcon />
         </div>
         
         <h1 style={{ 
-          color: "var(--text-dark-primary)", 
+          color: "var(--text-primary)", 
           fontSize: "24px", 
           fontWeight: 700,
           letterSpacing: "-0.5px", 
@@ -110,7 +117,7 @@ export default function StudentLogin() {
         }}>
           {isSignUp ? "Student Register" : "Student Login"}
         </h1>
-        <p style={{ color: "var(--text-dark-secondary)", fontSize: "14px", marginBottom: "32px", opacity: 0.8 }}>
+        <p style={{ color: "var(--text-secondary)", fontSize: "14px", marginBottom: "32px", opacity: 0.8 }}>
           {isSignUp ? "Create your credentials to submit complaints" : "Enter credentials to access your student desk"}
         </p>
         
@@ -137,7 +144,7 @@ export default function StudentLogin() {
                 placeholder="Full Name"
                 value={studentName}
                 onChange={(e) => setStudentName(e.target.value)}
-                className="form-input-dark"
+                className="form-input"
                 required
               />
               <input
@@ -145,7 +152,7 @@ export default function StudentLogin() {
                 placeholder="Student ID (e.g. 21BCE001)"
                 value={studentId}
                 onChange={(e) => setStudentId(e.target.value)}
-                className="form-input-dark"
+                className="form-input"
                 required
               />
             </>
@@ -155,7 +162,7 @@ export default function StudentLogin() {
             placeholder="Email Address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="form-input-dark"
+            className="form-input"
             required
           />
           <input
@@ -163,14 +170,14 @@ export default function StudentLogin() {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="form-input-dark"
+            className="form-input"
             required
           />
           
           <button 
             type="submit" 
             disabled={loading} 
-            className="btn-primary-dark"
+            className="btn-primary"
             style={{
               opacity: loading ? 0.7 : 1,
               cursor: loading ? "not-allowed" : "pointer",
@@ -192,14 +199,14 @@ export default function StudentLogin() {
             margin: "24px auto 0",
             background: "none", 
             border: "none", 
-            color: "#60a5fa", 
+            color: "var(--primary-color)", 
             cursor: "pointer", 
             fontSize: "14px",
             fontWeight: 500,
             transition: "color var(--transition-fast)"
           }}
-          onMouseOver={(e) => e.target.style.color = "#3b82f6"}
-          onMouseOut={(e) => e.target.style.color = "#60a5fa"}
+          onMouseOver={(e) => e.target.style.color = "var(--primary-hover)"}
+          onMouseOut={(e) => e.target.style.color = "var(--primary-color)"}
         >
           {isSignUp ? "Already have an account? Login" : "Don't have an account? Register"}
         </button>
@@ -209,7 +216,7 @@ export default function StudentLogin() {
           style={{ 
             display: "block",
             margin: "16px auto 0",
-            color: "var(--text-dark-secondary)", 
+            color: "var(--text-secondary)", 
             textDecoration: "none", 
             fontSize: "13px",
             opacity: 0.7,
