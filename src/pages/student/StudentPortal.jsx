@@ -359,7 +359,7 @@ export default function StudentPortal({ user, complaints, addComplaint, patchCom
             className={`segment-tab ${tab === "my" ? "active" : ""}`}
             onClick={() => setTab("my")}
           >
-            Track Complaints ({complaints.length})
+            My Complaints
           </button>
         </div>
 
