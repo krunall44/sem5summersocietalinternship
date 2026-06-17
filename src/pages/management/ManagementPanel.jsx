@@ -8,7 +8,8 @@ import {
   fmtDate, 
   callClaude,
   logoutUser,
-  deleteResolvedComplaints
+  deleteResolvedComplaints,
+  clearAllComplaints
 } from "../../utils/constants";
 
 // SVGs
@@ -294,6 +295,28 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
           </div>
           <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
             <ThemeToggle />
+            <button
+              onClick={async () => {
+                if (window.confirm("Are you sure you want to delete ALL complaints? This action is irreversible.")) {
+                  await clearAllComplaints();
+                }
+              }}
+              style={{
+                background: "rgba(239, 68, 68, 0.1)",
+                color: "#ef4444",
+                border: "1px solid rgba(239, 68, 68, 0.2)",
+                padding: "8px 14px",
+                borderRadius: "var(--radius-sm)",
+                fontSize: "13px",
+                fontWeight: 600,
+                cursor: "pointer",
+                transition: "all var(--transition-fast)"
+              }}
+              onMouseOver={(e) => e.target.style.background = "rgba(239, 68, 68, 0.2)"}
+              onMouseOut={(e) => e.target.style.background = "rgba(239, 68, 68, 0.1)"}
+            >
+              Clear All Data
+            </button>
             <Link
               to="/"
               style={{

@@ -132,6 +132,22 @@ export async function deleteResolvedComplaints() {
   }
 }
 
+export async function clearAllComplaints() {
+  try {
+    const snapshot = await getDocs(collection(db, COMPLAINTS_COL));
+    const batch = writeBatch(db);
+    snapshot.docs.forEach((doc) => {
+      batch.delete(doc.ref);
+    });
+    await batch.commit();
+    console.log("All complaints cleared successfully.");
+    return true;
+  } catch (e) {
+    console.error("Error clearing complaints: ", e);
+    return false;
+  }
+}
+
 // ── AI helper ─────────────────────────────────────────────────────────────
 export async function callClaude(systemPrompt, userMessage) {
   try {
