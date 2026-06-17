@@ -148,6 +148,37 @@ export async function clearAllComplaints() {
   }
 }
 
+// ── User Management Helpers ──────────────────────────────────────────────
+export function subscribeToPendingStudents(callback) {
+  const q = query(
+    collection(db, "users"),
+    where("role", "==", "student"),
+    where("approved", "==", false)
+  );
+  return onSnapshot(q, (snapshot) => {
+    const list = snapshot.docs.map(d => ({ uid: d.id, ...d.data() }));
+    callback(list);
+  });
+}
+
+export async function approveStudent(uid) {
+  try {
+    const docRef = doc(db, "users", uid);
+    await updateDoc(docRef, { approved: true });
+  } catch (e) {
+    console.error("Error approving student: ", e);
+  }
+}
+
+export async function rejectStudent(uid) {
+  try {
+    const docRef = doc(db, "users", uid);
+    await deleteDoc(docRef);
+  } catch (e) {
+    console.error("Error rejecting student: ", e);
+  }
+}
+
 // ── AI helper ─────────────────────────────────────────────────────────────
 export async function callClaude(systemPrompt, userMessage) {
   try {

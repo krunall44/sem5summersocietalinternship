@@ -20,12 +20,14 @@ export default function StudentLogin() {
   const [studentName, setStudentName] = useState("");
   const [studentId, setStudentId] = useState("");
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setMessage("");
     setLoading(true);
 
     try {
@@ -35,16 +37,33 @@ export default function StudentLogin() {
           name: studentName,
           id: studentId,
           role: "student",
-          email: email
+          email: email,
+          approved: false,
+          createdAt: new Date().toISOString()
         });
-        navigate("/student");
+        setMessage("Registration request sent! Please wait for admin approval before logging in.");
+        setIsSignUp(false);
+        setLoading(false);
+        // Do not navigate yet, wait for approval
+        return;
       } else {
         const res = await loginUser(email, password);
         const userDoc = await getDoc(doc(db, "users", res.user.uid));
-        if (userDoc.exists() && userDoc.data().role === "student") {
-          navigate("/student");
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          if (userData.role === "student") {
+            if (userData.approved) {
+              navigate("/student");
+            } else {
+              setError("Your registration is pending admin approval. Please check back later.");
+              setLoading(false);
+            }
+          } else {
+            setError("Access denied. This portal is for students only.");
+            setLoading(false);
+          }
         } else {
-          setError("Access denied. This portal is for students only.");
+          setError("User profile not found.");
           setLoading(false);
         }
       }
@@ -133,6 +152,21 @@ export default function StudentLogin() {
             textAlign: "left"
           }}>
             {error}
+          </div>
+        )}
+
+        {message && (
+          <div style={{ 
+            color: "#10b981", 
+            background: "rgba(16, 185, 129, 0.08)",
+            border: "1px solid rgba(16, 185, 129, 0.15)",
+            padding: "12px",
+            borderRadius: "var(--radius-sm)",
+            marginBottom: "24px", 
+            fontSize: "13px",
+            textAlign: "left"
+          }}>
+            {message}
           </div>
         )}
 

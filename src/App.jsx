@@ -26,6 +26,10 @@ const ProtectedRoute = ({ children, allowedRole, user }) => {
     return <Navigate to="/" replace />;
   }
 
+  if (user.role === "student" && !user.approved) {
+    return <Navigate to="/login/student" replace />;
+  }
+
   return children;
 };
 
