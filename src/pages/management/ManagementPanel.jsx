@@ -281,7 +281,7 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
           background: "var(--card-bg)",
           backdropFilter: "blur(12px)",
           borderBottom: "1px solid var(--border-color)",
-          padding: "18px 24px",
+          padding: "12px 16px",
           position: "sticky",
           top: 0,
           zIndex: 10,
@@ -295,36 +295,22 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
+            gap: "12px"
           }}
         >
-          <div>
-            <div
-              style={{
-                fontSize: "10px",
-                color: "var(--text-muted)",
-                letterSpacing: "1.2px",
-                fontWeight: 700,
-                marginBottom: "2px",
-              }}
-            >
-              HOSTELDESK
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: "9px", color: "var(--text-muted)", letterSpacing: "1px", fontWeight: 700, textTransform: "uppercase" }}>
+              HostelDesk
             </div>
-            <h1
-              style={{
-                fontSize: "18px",
-                color: "var(--text-primary)",
-                fontWeight: 800,
-                letterSpacing: "-0.3px"
-              }}
-            >
-              Management Console
+            <h1 style={{ fontSize: "16px", color: "var(--text-primary)", fontWeight: 800, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              Management
             </h1>
           </div>
-          <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
             <ThemeToggle />
             <button
               onClick={async () => {
-                if (window.confirm("Are you sure you want to delete ALL complaints? This action is irreversible.")) {
+                if (window.confirm("Are you sure you want to delete ALL complaints?")) {
                   await clearAllComplaints();
                 }
               }}
@@ -332,17 +318,14 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                 background: "rgba(239, 68, 68, 0.1)",
                 color: "#ef4444",
                 border: "1px solid rgba(239, 68, 68, 0.2)",
-                padding: "8px 14px",
+                padding: "6px 10px",
                 borderRadius: "var(--radius-sm)",
-                fontSize: "13px",
+                fontSize: "12px",
                 fontWeight: 600,
-                cursor: "pointer",
-                transition: "all var(--transition-fast)"
+                cursor: "pointer"
               }}
-              onMouseOver={(e) => e.target.style.background = "rgba(239, 68, 68, 0.2)"}
-              onMouseOut={(e) => e.target.style.background = "rgba(239, 68, 68, 0.1)"}
             >
-              Clear All Data
+              Clear
             </button>
             <Link
               to="/"
@@ -350,18 +333,17 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                 background: "rgba(156, 163, 175, 0.1)",
                 color: "var(--text-secondary)",
                 border: "1px solid var(--border-color)",
-                padding: "8px 14px",
+                padding: "6px 10px",
                 borderRadius: "var(--radius-sm)",
                 textDecoration: "none",
-                fontSize: "13px",
-                fontWeight: 500,
+                fontSize: "12px",
+                fontWeight: 600,
                 display: "inline-flex",
-                alignItems: "center",
-                transition: "all var(--transition-fast)"
+                alignItems: "center"
               }}
             >
               <BackIcon />
-              Back
+              <span className="hide-on-mobile">Back</span>
             </Link>
             <button
               onClick={async () => {
@@ -372,18 +354,17 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                 background: "#b91c1c",
                 color: "white",
                 border: "none",
-                padding: "8px 14px",
+                padding: "6px 10px",
                 borderRadius: "var(--radius-sm)",
                 cursor: "pointer",
-                fontSize: "13px",
+                fontSize: "12px",
                 fontWeight: 600,
                 display: "inline-flex",
-                alignItems: "center",
-                transition: "opacity var(--transition-fast)"
+                alignItems: "center"
               }}
             >
-              Logout
-              <LogoutIcon />
+              <span className="hide-on-mobile">Logout</span>
+              <LogoutIcon style={{ margin: "0 !important" }} />
             </button>
           </div>
         </div>
