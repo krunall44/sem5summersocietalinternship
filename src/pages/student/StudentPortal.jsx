@@ -645,8 +645,6 @@ export default function StudentPortal({ user, complaints, addComplaint, patchCom
                           gap: "6px 12px",
                         }}
                       >
-                        <span>ID: <strong style={{ color: "var(--text-primary)" }}>{c.id}</strong></span>
-                        <span>•</span>
                         <span>{c.category}</span>
                         <span>•</span>
                         <span>Room {c.room}</span>

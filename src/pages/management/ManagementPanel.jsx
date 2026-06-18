@@ -106,6 +106,8 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
   const [filter, setFilter] = useState("All");
   const [search, setSearch] = useState("");
   const [sel, setSel] = useState(null);
+  const [sortBy, setSortBy] = useState("date");
+  const [sortOrder, setSortOrder] = useState("desc");
   const [note, setNote] = useState("");
   const [assignTo, setAssignTo] = useState("");
   const [confirmRes, setConfirmRes] = useState(false);
@@ -154,7 +156,32 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
       c.title.toLowerCase().includes(q) ||
       c.description.toLowerCase().includes(q)
     );
+  }).sort((a, b) => {
+    let va = a[sortBy] || "", vb = b[sortBy] || "";
+    if (sortBy === "date") {
+      va = new Date(va);
+      vb = new Date(vb);
+    }
+    if (sortBy === "priority") {
+      const rank = { Critical: 4, High: 3, Medium: 2, Low: 1 };
+      va = rank[a.priority] || 0;
+      vb = rank[b.priority] || 0;
+    }
+    if (typeof va === "string") va = va.toLowerCase();
+    if (typeof vb === "string") vb = vb.toLowerCase();
+    if (va < vb) return sortOrder === "asc" ? -1 : 1;
+    if (va > vb) return sortOrder === "asc" ? 1 : -1;
+    return 0;
   });
+
+  function toggleSort(col) {
+    if (sortBy === col) {
+      setSortOrder((o) => (o === "asc" ? "desc" : "asc"));
+    } else {
+      setSortBy(col);
+      setSortOrder("asc");
+    }
+  }
 
   function changeStatus(id, status) {
     patchComplaint(id, { status });
@@ -560,121 +587,100 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                   })}
                 </div>
 
-                {list.length === 0 && (
-                  <div
-                    style={{
-                      textAlign: "center",
-                      color: "var(--text-muted)",
-                      padding: "64px 0",
-                      background: "var(--card-glass)",
-                      borderRadius: "var(--radius-lg)",
-                      border: "1px dashed var(--border-color)"
-                    }}
-                  >
-                    No database records match this query.
-                  </div>
-                )}
-                
-                {list.map((c) => {
-                  const sm = STATUS_META[c.status];
-                  return (
-                    <div
-                      key={c.id}
-                      className={`complaint-row ${sel?.id === c.id ? "active" : ""}`}
-                      onClick={() => {
-                        setSel(c);
-                        setNote("");
-                        setAssignTo("");
-                        setAiPanel("");
-                        setConfirmRes(false);
-                      }}
-                    >
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "flex-start",
-                          gap: "12px",
-                        }}
-                      >
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div
-                            style={{
-                              fontWeight: 700,
-                              color: "var(--text-primary)",
-                              fontSize: "14px",
-                              whiteSpace: "nowrap",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              marginBottom: "4px"
-                            }}
-                          >
-                            {c.title}
-                          </div>
-                          <div
-                            style={{
-                              color: "var(--text-secondary)",
-                              fontSize: "12px",
-                              display: "flex",
-                              gap: "8px",
-                              opacity: 0.8
-                            }}
-                          >
-                            <span>ID: <strong>{c.id}</strong></span>
-                            <span>•</span>
-                            <span>Rm {c.room}</span>
-                          </div>
-                        </div>
-                        
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "flex-end",
-                            gap: "6px",
-                            flexShrink: 0,
-                          }}
-                        >
-                          <span
-                            style={{
-                              background: sm.bg,
-                              color: sm.text,
-                              border: `1px solid ${sm.text}20`,
-                              padding: "2px 8px",
-                              borderRadius: "12px",
-                              fontSize: "10px",
-                              fontWeight: 700,
-                            }}
-                          >
-                            {c.status}
-                          </span>
-                          <span
-                            style={{
-                              color: PRIORITY_COLOR[c.priority],
-                              fontSize: "11px",
-                              fontWeight: 700,
-                            }}
-                          >
-                            ● {c.priority}
-                          </span>
-                        </div>
-                      </div>
-                      
-                      <div
-                        style={{
-                          color: "var(--text-muted)",
-                          fontSize: "11px",
-                          marginTop: "10px",
-                          display: "flex",
-                          justifyContent: "space-between"
-                        }}
-                      >
-                        <span>{c.category}</span>
-                        <span>{fmtDate(c.date)}</span>
-                      </div>
-                    </div>
-                  );
-                })}
+                <div style={{ overflowX: "auto" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
+                    <thead>
+                      <tr style={{ borderBottom: "2px solid var(--border-color)", color: "var(--text-secondary)" }}>
+                        {[
+                          { key: "studentName", label: "Student" },
+                          { key: "title", label: "Title" },
+                          { key: "room", label: "Room" },
+                          { key: "category", label: "Category" },
+                          { key: "priority", label: "Priority" },
+                          { key: "status", label: "Status" },
+                          { key: "date", label: "Date" },
+                        ].map((col) => {
+                          const active = sortBy === col.key;
+                          return (
+                            <th
+                              key={col.key}
+                              onClick={() => toggleSort(col.key)}
+                              style={{
+                                padding: "10px 8px",
+                                textAlign: "left",
+                                fontWeight: 700,
+                                fontSize: "11px",
+                                letterSpacing: "0.5px",
+                                textTransform: "uppercase",
+                                cursor: "pointer",
+                                userSelect: "none",
+                                whiteSpace: "nowrap",
+                                color: active ? "var(--primary-color)" : "var(--text-secondary)",
+                                borderBottom: active ? "2px solid var(--primary-color)" : "2px solid var(--border-color)",
+                              }}
+                            >
+                              {col.label} {active ? (sortOrder === "asc" ? "▲" : "▼") : ""}
+                            </th>
+                          );
+                        })}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {list.length === 0 ? (
+                        <tr>
+                          <td colSpan={7} style={{ textAlign: "center", color: "var(--text-muted)", padding: "64px 0" }}>
+                            No database records match this query.
+                          </td>
+                        </tr>
+                      ) : (
+                        list.map((c) => {
+                          const sm = STATUS_META[c.status];
+                          return (
+                            <tr
+                              key={c.id}
+                              onClick={() => {
+                                setSel(c);
+                                setNote("");
+                                setAssignTo("");
+                                setAiPanel("");
+                                setConfirmRes(false);
+                              }}
+                              style={{
+                                cursor: "pointer",
+                                transition: "background var(--transition-normal)",
+                                borderBottom: "1px solid var(--border-color)",
+                                background: sel?.id === c.id ? "var(--primary-glow)" : "transparent",
+                              }}
+                              onMouseEnter={(e) => { e.currentTarget.style.background = "var(--card-glass-hover)"; }}
+                              onMouseLeave={(e) => { e.currentTarget.style.background = sel?.id === c.id ? "var(--primary-glow)" : "transparent"; }}
+                            >
+                              <td style={{ padding: "12px 8px", color: "var(--text-primary)", fontWeight: 600 }}>{c.studentName}</td>
+                              <td style={{ padding: "12px 8px", color: "var(--text-primary)", maxWidth: "200px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.title}</td>
+                              <td style={{ padding: "12px 8px", color: "var(--text-secondary)" }}>{c.room}</td>
+                              <td style={{ padding: "12px 8px", color: "var(--text-secondary)" }}>{c.category}</td>
+                              <td style={{ padding: "12px 8px", color: PRIORITY_COLOR[c.priority], fontWeight: 700, fontSize: "12px" }}>● {c.priority}</td>
+                              <td style={{ padding: "12px 8px" }}>
+                                <span style={{
+                                  background: sm.bg,
+                                  color: sm.text,
+                                  border: `1px solid ${sm.text}20`,
+                                  padding: "2px 8px",
+                                  borderRadius: "12px",
+                                  fontSize: "11px",
+                                  fontWeight: 700,
+                                  whiteSpace: "nowrap",
+                                }}>
+                                  {c.status}
+                                </span>
+                              </td>
+                              <td style={{ padding: "12px 8px", color: "var(--text-muted)", fontSize: "12px", whiteSpace: "nowrap" }}>{fmtDate(c.date)}</td>
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
 
               {/* RIGHT: Off-canvas Detail Drawer */}
@@ -734,15 +740,7 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                         >
                           {sel.title}
                         </h2>
-                        <div
-                          style={{
-                            color: "var(--text-muted)",
-                            fontSize: "13px",
-                            marginTop: "4px",
-                          }}
-                        >
-                          Ticket ID: {sel.id}
-                        </div>
+
                       </div>
                       <button
                         onClick={closeDrawer}
