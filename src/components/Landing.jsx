@@ -181,7 +181,7 @@ export default function Landing({ stats }) {
           HostelDesk
         </h1>
         <p style={{ color: "var(--text-secondary)", fontSize: "14px", fontWeight: 400, opacity: 0.85 }}>
-          Smart Hostel Complaint & Maintenance Hub
+          Smart Hostel Management & Maintenance Hub
         </p>
       </div>
 
@@ -262,56 +262,6 @@ export default function Landing({ stats }) {
       </div>
 
       {/* Modern Metric Counter Rows */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
-          gap: "16px",
-          width: "100%",
-          padding: "0 16px",
-          maxWidth: "800px",
-          position: "relative",
-          zIndex: 1,
-        }}
-        className="animate-fade-in"
-      >
-        {[
-          { icon: <TotalIcon />, val: stats.total, label: "Total items", color: "#60a5fa" },
-          { icon: <PendingIcon />, val: stats.pending, label: "Pending", color: "#fbbf24" },
-          { icon: <ProgressIcon />, val: stats.inProgress, label: "In progress", color: "#3b82f6" },
-          { icon: <ResolvedIcon />, val: stats.resolved, label: "Resolved", color: "#10b981" },
-        ].map((item, idx) => (
-          <div 
-            key={item.label} 
-            className="stat-glow"
-            style={{ 
-              textAlign: "center", 
-              borderRadius: "var(--radius-md)", 
-              padding: "16px 12px",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center"
-            }}
-          >
-            <div style={{ color: item.color, marginBottom: "8px", opacity: 0.9 }}>{item.icon}</div>
-            <div
-              style={{
-                color: "var(--text-primary)",
-                fontSize: "24px",
-                fontWeight: 800,
-                lineHeight: 1
-              }}
-            >
-              {item.val}
-            </div>
-            <div
-              style={{ color: "var(--text-secondary)", fontSize: "11px", marginTop: "6px", opacity: 0.6 }}
-            >
-              {item.label}
-            </div>
-          </div>
-        ))}
-      </div>
 
       <p
         style={{

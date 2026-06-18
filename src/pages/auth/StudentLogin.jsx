@@ -137,7 +137,7 @@ export default function StudentLogin() {
           {isSignUp ? "Student Register" : "Student Login"}
         </h1>
         <p style={{ color: "var(--text-secondary)", fontSize: "14px", marginBottom: "32px", opacity: 0.8 }}>
-          {isSignUp ? "Create your credentials to submit complaints" : "Enter credentials to access your student desk"}
+          {isSignUp ? "Create your credentials to get started" : "Enter credentials to access your student desk"}
         </p>
         
         {error && (

@@ -8,7 +8,6 @@ import {
   fmtDate, 
   callClaude,
   logoutUser,
-  deleteResolvedComplaints,
   clearAllComplaints,
   subscribeToPendingStudents,
   approveStudent,
@@ -112,14 +111,31 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
   const [confirmRes, setConfirmRes] = useState(false);
   const [aiWorking, setAiWorking] = useState(false);
   const [aiPanel, setAiPanel] = useState("");
+  const [isClosing, setIsClosing] = useState(false);
+
+  const closeDrawer = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      setSel(null);
+      setIsClosing(false);
+    }, 350);
+  };
 
   useEffect(() => {
-    deleteResolvedComplaints();
     const unsubscribe = subscribeToPendingStudents((students) => {
       setPendingStudents(students);
     });
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (sel) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => { document.body.style.overflow = "unset"; };
+  }, [sel]);
 
   useEffect(() => {
     if (sel) {
@@ -212,6 +228,11 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
           border: 1px solid var(--border-color); 
           cursor: pointer; 
           transition: all var(--transition-normal); 
+          user-select: none;
+        }
+        .detail-drawer {
+          will-change: transform, opacity;
+          overscroll-behavior: contain;
         }
         .complaint-row:hover { 
           background: var(--card-glass-hover); 
@@ -272,6 +293,22 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
         }
         @media (min-width: 769px) { 
           .show-only-mobile { display: none !important; } 
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes fadeOut {
+          from { opacity: 1; }
+          to { opacity: 0; }
+        }
+        @keyframes slideInRight {
+          from { transform: translateX(100%); }
+          to { transform: translateX(0); }
+        }
+        @keyframes slideOutRight {
+          from { transform: translateX(0); }
+          to { transform: translateX(100%); }
         }
       `}</style>
 
@@ -442,7 +479,6 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                 marginBottom: "28px",
                 flexWrap: "wrap",
               }}
-              className={sel ? "hide-on-mobile" : ""}
             >
               {[
                 { icon: <TotalIcon />, label: "Total Queries", val: stats.total, color: "#60a5fa" },
@@ -474,8 +510,8 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
 
               {/* LEFT: Complaint Directory */}
               <div 
-                className={`full-width-mobile ${sel ? "hide-on-mobile" : ""}`}
-                style={{ flex: "1 1 300px", width: "100%" }}
+                className="full-width-mobile"
+                style={{ flex: "1 1 100%", width: "100%" }}
               >
                 <div style={{ position: "relative", marginBottom: "16px" }}>
                   <input
@@ -641,71 +677,58 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                 })}
               </div>
 
-              {/* RIGHT: Detail Inspector */}
-              <div 
-                className={`full-width-mobile ${!sel ? "hide-on-mobile" : ""}`}
-                style={{ flex: "1 1 300px", width: "100%", position: "sticky", top: "100px" }}
-              >
-                {!sel ? (
-                  <div
+              {/* RIGHT: Off-canvas Detail Drawer */}
+              {sel && (
+                <>
+                  {/* Backdrop Overlay */}
+                  <div 
+                    onClick={closeDrawer}
                     style={{
-                      background: "var(--card-glass)",
-                      border: "1px dashed var(--border-color)",
-                      borderRadius: "var(--radius-lg)",
-                      padding: "80px 24px",
-                      textAlign: "center",
+                      position: "fixed",
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      background: "rgba(0, 0, 0, 0.4)",
+                      backdropFilter: "blur(4px)",
+                      zIndex: 1000,
+                      animation: `${isClosing ? "fadeOut" : "fadeIn"} 0.3s ease-out forwards`
+                    }}
+                  />
+                  
+                  {/* Drawer Panel */}
+                  <div 
+                    className="detail-drawer"
+                    style={{ 
+                      position: "fixed",
+                      top: 0,
+                      right: 0,
+                      bottom: 0,
+                      width: "min(650px, 95vw)",
+                      background: "var(--bg-primary)",
+                      borderLeft: "1px solid var(--border-color)",
+                      boxShadow: "-10px 0 30px rgba(0,0,0,0.15)",
+                      zIndex: 1001,
+                      overflowY: "auto",
+                      padding: "32px",
+                      animation: `${isClosing ? "slideOutRight 0.35s ease-in" : "slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1)"} forwards`
                     }}
                   >
-                    <div style={{ color: "var(--text-muted)", fontSize: "14px" }}>
-                      Select a logged ticket from the left panel to inspect details.
-                    </div>
-                  </div>
-                ) : (
-                  <div
-                    style={{
-                      background: "var(--card-bg)",
-                      border: "1px solid var(--border-color)",
-                      borderRadius: "var(--radius-lg)",
-                      padding: "24px",
-                    }}
-                  >
-                    <button
-                      className="show-only-mobile"
-                      onClick={() => setSel(null)}
-                      style={{
-                        background: "var(--card-glass)",
-                        color: "var(--text-primary)",
-                        border: "1px solid var(--border-color)",
-                        padding: "8px 12px",
-                        borderRadius: "var(--radius-sm)",
-                        fontSize: "13px",
-                        fontWeight: 600,
-                        cursor: "pointer",
-                        marginBottom: "20px",
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "6px"
-                      }}
-                    >
-                      <BackIcon />
-                      Back to Directory
-                    </button>
-
                     <div
                       style={{
                         display: "flex",
                         justifyContent: "space-between",
                         alignItems: "flex-start",
-                        marginBottom: "20px",
+                        marginBottom: "24px",
                         gap: "12px"
                       }}
                     >
                       <div>
                         <h2
                           style={{
-                            fontSize: "18px",
+                            fontSize: "20px",
                             color: "var(--text-primary)",
-                            fontWeight: 700,
+                            fontWeight: 800,
                             lineHeight: 1.3,
                           }}
                         >
@@ -714,7 +737,7 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                         <div
                           style={{
                             color: "var(--text-muted)",
-                            fontSize: "12px",
+                            fontSize: "13px",
                             marginTop: "4px",
                           }}
                         >
@@ -722,16 +745,16 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                         </div>
                       </div>
                       <button
-                        onClick={() => setSel(null)}
+                        onClick={closeDrawer}
                         style={{
-                          background: "none",
+                          background: "var(--card-glass)",
                           color: "var(--text-muted)",
-                          border: "none",
+                          border: "1px solid var(--border-color)",
                           cursor: "pointer",
                           display: "flex",
-                          padding: "4px",
+                          padding: "8px",
+                          borderRadius: "50%",
                         }}
-                        className="hide-on-mobile"
                       >
                         <CloseIcon />
                       </button>
@@ -740,9 +763,9 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                     <div
                       style={{
                         display: "grid",
-                        gridTemplateColumns: "repeat(auto-fit, minmax(110px, 1fr))",
+                        gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))",
                         gap: "14px",
-                        marginBottom: "20px",
+                        marginBottom: "24px",
                         background: "rgba(156, 163, 175, 0.05)",
                         border: "1px solid var(--border-color)",
                         borderRadius: "var(--radius-md)",
@@ -770,7 +793,7 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                       ))}
                     </div>
 
-                    <div style={{ marginBottom: "20px" }}>
+                    <div style={{ marginBottom: "24px" }}>
                       <span className="panel-label">Student Statement</span>
                       <div
                         style={{
@@ -787,7 +810,7 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                       </div>
                     </div>
 
-                    <div style={{ marginBottom: "20px" }}>
+                    <div style={{ marginBottom: "24px" }}>
                       <span className="panel-label">Update Status</span>
                       <div
                         style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}
@@ -819,7 +842,7 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                       </div>
                     </div>
 
-                    <div style={{ marginBottom: "20px" }}>
+                    <div style={{ marginBottom: "24px" }}>
                       <span className="panel-label">Assign Technician</span>
                       <input
                         className="form-input"
@@ -840,7 +863,7 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                       )}
                     </div>
 
-                    <div style={{ marginBottom: "20px" }}>
+                    <div style={{ marginBottom: "24px" }}>
                       <div
                         style={{
                           display: "flex",
@@ -946,8 +969,8 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
                       )}
                     </div>
                   </div>
-                )}
-              </div>
+                </>
+              )}
             </div>
           </>
         ) : (
