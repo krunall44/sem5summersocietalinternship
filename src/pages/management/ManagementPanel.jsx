@@ -154,21 +154,35 @@ export default function ManagementPanel({ complaints, patchComplaint, stats }) {
       c.studentName.toLowerCase().includes(q) ||
       c.room.toLowerCase().includes(q) ||
       c.title.toLowerCase().includes(q) ||
+      c.category.toLowerCase().includes(q) ||
+      (c.priority || "").toLowerCase().includes(q) ||
+      (c.status || "").toLowerCase().includes(q) ||
+      (c.date || "").toLowerCase().includes(q) ||
+      (c.date ? fmtDate(c.date) : "").toLowerCase().includes(q) ||
       c.description.toLowerCase().includes(q)
     );
   }).sort((a, b) => {
-    let va = a[sortBy] || "", vb = b[sortBy] || "";
+    let va, vb;
     if (sortBy === "date") {
-      va = new Date(va);
-      vb = new Date(vb);
+      va = a.date ? new Date(a.date).getTime() : 0;
+      vb = b.date ? new Date(b.date).getTime() : 0;
+      if (isNaN(va)) va = 0;
+      if (isNaN(vb)) vb = 0;
+    } else if (sortBy === "priority") {
+      const rank = { critical: 4, high: 3, medium: 2, low: 1 };
+      va = rank[(a.priority || "").toLowerCase()] || 0;
+      vb = rank[(b.priority || "").toLowerCase()] || 0;
+    } else if (sortBy === "status") {
+      const rank = { pending: 1, "in progress": 2, resolved: 3 };
+      va = rank[(a.status || "").toLowerCase()] || 0;
+      vb = rank[(b.status || "").toLowerCase()] || 0;
+    } else {
+      va = a[sortBy] || "";
+      vb = b[sortBy] || "";
+      if (typeof va === "string") va = va.toLowerCase();
+      if (typeof vb === "string") vb = vb.toLowerCase();
     }
-    if (sortBy === "priority") {
-      const rank = { Critical: 4, High: 3, Medium: 2, Low: 1 };
-      va = rank[a.priority] || 0;
-      vb = rank[b.priority] || 0;
-    }
-    if (typeof va === "string") va = va.toLowerCase();
-    if (typeof vb === "string") vb = vb.toLowerCase();
+
     if (va < vb) return sortOrder === "asc" ? -1 : 1;
     if (va > vb) return sortOrder === "asc" ? 1 : -1;
     return 0;
