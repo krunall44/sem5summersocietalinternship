@@ -32,7 +32,28 @@ export default function StudentLogin() {
 
     try {
       if (isSignUp) {
-        const res = await createUserWithEmailAndPassword(auth, email, password);
+        let res;
+        try {
+          res = await createUserWithEmailAndPassword(auth, email, password);
+        } catch (err) {
+          if (err.code === "auth/email-already-in-use") {
+            try {
+              // Account exists in Firebase Auth. Check if we can sign in with the password
+              // to confirm ownership, and recreate the Firestore profile if it is missing.
+              const loginRes = await loginUser(email, password);
+              const userDoc = await getDoc(doc(db, "users", loginRes.user.uid));
+              if (!userDoc.exists()) {
+                res = loginRes;
+              } else {
+                throw err;
+              }
+            } catch (loginErr) {
+              throw err;
+            }
+          } else {
+            throw err;
+          }
+        }
         await setDoc(doc(db, "users", res.user.uid), {
           name: studentName,
           id: studentId,
