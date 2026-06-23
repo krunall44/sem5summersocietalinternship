@@ -1,7 +1,7 @@
 
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import { getAuth, setPersistence, browserSessionPersistence } from "firebase/auth";
+import { initializeAuth, browserSessionPersistence } from "firebase/auth";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -16,11 +16,10 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
-export const auth = getAuth(app);
 
-// Use session persistence so tabs are isolated (student and admin can stay logged in simultaneously in different tabs)
-setPersistence(auth, browserSessionPersistence)
-  .catch((error) => {
-    console.error("Error setting Firebase Auth persistence:", error);
-  });
+// Initialize Firebase Auth with browserSessionPersistence synchronously
+export const auth = initializeAuth(app, {
+  persistence: browserSessionPersistence
+});
+
 
