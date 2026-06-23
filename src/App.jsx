@@ -43,7 +43,7 @@ export default function App() {
     const unsubscribe = observeAuth(async (firebaseUser) => {
       if (firebaseUser) {
         const profile = await getUserProfile(firebaseUser.uid);
-        setUser(profile ? { ...firebaseUser, ...profile } : null);
+        setUser(profile ? { uid: firebaseUser.uid, ...profile } : null);
       } else {
         setUser(null);
       }
