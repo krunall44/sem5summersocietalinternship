@@ -52,13 +52,15 @@ import {
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
   signOut, 
-  onAuthStateChanged 
+  onAuthStateChanged,
+  sendEmailVerification 
 } from "firebase/auth";
 
 // ── Auth Helpers ──────────────────────────────────────────────────────────
 export const loginUser = (email, password) => signInWithEmailAndPassword(auth, email, password);
 export const logoutUser = () => signOut(auth);
 export const observeAuth = (callback) => onAuthStateChanged(auth, callback);
+export const sendVerificationEmail = (user) => sendEmailVerification(user);
 
 export async function getUserProfile(uid) {
   const docRef = doc(db, "users", uid);
@@ -124,7 +126,9 @@ export function subscribeToPendingStudents(callback) {
     where("approved", "==", false)
   );
   return onSnapshot(q, (snapshot) => {
-    const list = snapshot.docs.map(d => ({ uid: d.id, ...d.data() }));
+    const list = snapshot.docs
+      .map(d => ({ uid: d.id, ...d.data() }))
+      .filter(s => s.rejected !== true);
     callback(list);
   });
 }
@@ -141,7 +145,7 @@ export async function approveStudent(uid) {
 export async function rejectStudent(uid) {
   try {
     const docRef = doc(db, "users", uid);
-    await deleteDoc(docRef);
+    await updateDoc(docRef, { approved: false, rejected: true });
   } catch (e) {
     console.error("Error rejecting student: ", e);
   }

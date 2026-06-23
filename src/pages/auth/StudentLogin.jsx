@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { loginUser } from "../../utils/constants";
+import { loginUser, sendVerificationEmail } from "../../utils/constants";
 import { auth, db } from "../../utils/firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
 import ThemeToggle from "../../components/ThemeToggle";
 
 const UserIcon = () => (
@@ -22,6 +22,7 @@ export default function StudentLogin() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showVerify, setShowVerify] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -54,18 +55,10 @@ export default function StudentLogin() {
             throw err;
           }
         }
-        await setDoc(doc(db, "users", res.user.uid), {
-          name: studentName,
-          id: studentId,
-          role: "student",
-          email: email,
-          approved: false,
-          createdAt: new Date().toISOString()
-        });
-        setMessage("Registration request sent! Please wait for admin approval before logging in.");
-        setIsSignUp(false);
+        // Send verification email before creating Firestore profile
+        await sendVerificationEmail(res.user);
+        setShowVerify(true);
         setLoading(false);
-        // Do not navigate yet, wait for approval
         return;
       } else {
         const res = await loginUser(email, password);
@@ -92,6 +85,88 @@ export default function StudentLogin() {
       setError(err.message);
       setLoading(false);
     }
+  };
+
+  const handleVerifyEmail = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      await auth.currentUser.reload();
+      if (auth.currentUser.emailVerified) {
+        await setDoc(doc(db, "users", auth.currentUser.uid), {
+          name: studentName,
+          id: studentId,
+          role: "student",
+          email: email,
+          approved: false,
+          rejected: false,
+          createdAt: new Date().toISOString()
+        });
+        setShowVerify(false);
+        setError("");
+        setMessage("Email verified! You can login after admin approval.");
+        setEmail("");
+        setPassword("");
+        setStudentName("");
+        setStudentId("");
+      } else {
+        setError("Email not verified yet. Please check your inbox and click the verification link.");
+      }
+    } catch (err) {
+      setError(err.message);
+    }
+    setLoading(false);
+  };
+
+  const handleResendVerification = async () => {
+    setError("");
+    setMessage("");
+    setLoading(true);
+    try {
+      const user = auth.currentUser;
+      if (user) {
+        await sendVerificationEmail(user);
+        setMessage("Verification email resent. Please check your inbox.");
+      }
+    } catch (err) {
+      setError(err.message);
+    }
+    setLoading(false);
+  };
+
+  const [statusType, setStatusType] = useState("");
+
+  const handleCheckStatus = async () => {
+    setError("");
+    setMessage("");
+    setStatusType("");
+    if (!email) {
+      setError("Please enter your email address first.");
+      return;
+    }
+    setLoading(true);
+    try {
+      const q = query(collection(db, "users"), where("email", "==", email));
+      const snapshot = await getDocs(q);
+      if (snapshot.empty) {
+        setError("No account found with this email. Please register first.");
+      } else {
+        const userData = snapshot.docs[0].data();
+        if (userData.approved) {
+          setMessage("Your account is approved! You can login now.");
+          setStatusType("approved");
+        } else if (userData.rejected) {
+          setMessage("Your registration has been rejected. Please contact admin.");
+          setStatusType("rejected");
+        } else {
+          setMessage("Your registration is pending admin approval. Please check back later.");
+          setStatusType("pending");
+        }
+      }
+    } catch (err) {
+      setError(err.message);
+    }
+    setLoading(false);
   };
 
   return (
@@ -178,9 +253,9 @@ export default function StudentLogin() {
 
         {message && (
           <div style={{ 
-            color: "#10b981", 
-            background: "rgba(16, 185, 129, 0.08)",
-            border: "1px solid rgba(16, 185, 129, 0.15)",
+            color: statusType === "rejected" ? "#ef4444" : statusType === "pending" ? "#f59e0b" : "#10b981", 
+            background: statusType === "rejected" ? "rgba(239, 68, 68, 0.08)" : statusType === "pending" ? "rgba(245, 158, 11, 0.08)" : "rgba(16, 185, 129, 0.08)",
+            border: statusType === "rejected" ? "1px solid rgba(239, 68, 68, 0.15)" : statusType === "pending" ? "1px solid rgba(245, 158, 11, 0.15)" : "1px solid rgba(16, 185, 129, 0.15)",
             padding: "12px",
             borderRadius: "var(--radius-sm)",
             marginBottom: "24px", 
@@ -191,80 +266,161 @@ export default function StudentLogin() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-          {isSignUp && (
-            <>
+        {showVerify ? (
+          <div style={{ textAlign: "center" }}>
+            <div style={{
+              display: "inline-flex",
+              padding: "12px",
+              background: "var(--primary-glow)",
+              borderRadius: "50%",
+              marginBottom: "16px",
+              border: "1px solid var(--border-color)"
+            }}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+            </div>
+            <h2 style={{ color: "var(--text-primary)", fontSize: "20px", fontWeight: 600, marginBottom: "12px" }}>
+              Verify Your Email
+            </h2>
+            <p style={{ color: "var(--text-secondary)", fontSize: "14px", marginBottom: "24px", lineHeight: 1.6 }}>
+              A verification email has been sent to <strong>{email}</strong>.<br />
+              Please check your inbox and click the verification link.
+            </p>
+            <button 
+              onClick={handleVerifyEmail}
+              disabled={loading}
+              className="btn-primary"
+              style={{
+                opacity: loading ? 0.7 : 1,
+                cursor: loading ? "not-allowed" : "pointer",
+                width: "100%",
+                marginBottom: "12px"
+              }}
+            >
+              {loading ? "Checking..." : "I've verified my email"}
+            </button>
+            <button 
+              onClick={handleResendVerification}
+              disabled={loading}
+              style={{
+                display: "block",
+                width: "100%",
+                padding: "10px 0",
+                background: "none",
+                border: "1px solid var(--border-color)",
+                borderRadius: "var(--radius-sm)",
+                color: "var(--text-secondary)",
+                cursor: loading ? "not-allowed" : "pointer",
+                fontSize: "13px",
+                transition: "all var(--transition-fast)"
+              }}
+              onMouseOver={(e) => { if (!loading) e.target.style.borderColor = "var(--primary-color)"; }}
+              onMouseOut={(e) => { if (!loading) e.target.style.borderColor = "var(--border-color)"; }}
+            >
+              Resend verification email
+            </button>
+          </div>
+        ) : (
+          <>
+            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              {isSignUp && (
+                <>
+                  <input
+                    type="text"
+                    placeholder="Full Name"
+                    value={studentName}
+                    onChange={(e) => setStudentName(e.target.value)}
+                    className="form-input"
+                    required
+                  />
+                  <input
+                    type="text"
+                    placeholder="Student ID (e.g. 21BCE001)"
+                    value={studentId}
+                    onChange={(e) => setStudentId(e.target.value)}
+                    className="form-input"
+                    required
+                  />
+                </>
+              )}
               <input
-                type="text"
-                placeholder="Full Name"
-                value={studentName}
-                onChange={(e) => setStudentName(e.target.value)}
+                type="email"
+                placeholder="Email Address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="form-input"
                 required
               />
               <input
-                type="text"
-                placeholder="Student ID (e.g. 21BCE001)"
-                value={studentId}
-                onChange={(e) => setStudentId(e.target.value)}
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="form-input"
                 required
               />
-            </>
-          )}
-          <input
-            type="email"
-            placeholder="Email Address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="form-input"
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="form-input"
-            required
-          />
-          
-          <button 
-            type="submit" 
-            disabled={loading} 
-            className="btn-primary"
-            style={{
-              opacity: loading ? 0.7 : 1,
-              cursor: loading ? "not-allowed" : "pointer",
-              marginTop: "8px",
-              width: "100%"
-            }}
-          >
-            {loading ? "Processing..." : (isSignUp ? "Register" : "Login")}
-          </button>
-        </form>
-        
-        <button 
-          onClick={() => {
-            setIsSignUp(!isSignUp);
-            setError("");
-          }}
-          style={{ 
-            display: "block",
-            margin: "24px auto 0",
-            background: "none", 
-            border: "none", 
-            color: "var(--primary-color)", 
-            cursor: "pointer", 
-            fontSize: "14px",
-            fontWeight: 500,
-            transition: "color var(--transition-fast)"
-          }}
-          onMouseOver={(e) => e.target.style.color = "var(--primary-hover)"}
-          onMouseOut={(e) => e.target.style.color = "var(--primary-color)"}
-        >
-          {isSignUp ? "Already have an account? Login" : "Don't have an account? Register"}
-        </button>
+              
+              <button 
+                type="submit" 
+                disabled={loading} 
+                className="btn-primary"
+                style={{
+                  opacity: loading ? 0.7 : 1,
+                  cursor: loading ? "not-allowed" : "pointer",
+                  marginTop: "8px",
+                  width: "100%"
+                }}
+              >
+                {loading ? "Processing..." : (isSignUp ? "Register" : "Login")}
+              </button>
+            </form>
+            
+            <button 
+              onClick={() => {
+                setIsSignUp(!isSignUp);
+                setError("");
+              }}
+              style={{ 
+                display: "block",
+                margin: "24px auto 0",
+                background: "none", 
+                border: "none", 
+                color: "var(--primary-color)", 
+                cursor: "pointer", 
+                fontSize: "14px",
+                fontWeight: 500,
+                transition: "color var(--transition-fast)"
+              }}
+              onMouseOver={(e) => e.target.style.color = "var(--primary-hover)"}
+              onMouseOut={(e) => e.target.style.color = "var(--primary-color)"}
+            >
+              {isSignUp ? "Already have an account? Login" : "Don't have an account? Register"}
+            </button>
+            {!isSignUp && (
+              <button 
+                onClick={handleCheckStatus}
+                disabled={loading}
+                style={{ 
+                  display: "block",
+                  margin: "12px auto 0",
+                  background: "none", 
+                  border: "none", 
+                  color: "var(--text-secondary)", 
+                  cursor: loading ? "not-allowed" : "pointer", 
+                  fontSize: "13px",
+                  opacity: 0.7,
+                  transition: "opacity var(--transition-fast)"
+                }}
+                onMouseOver={(e) => { if (!loading) e.target.style.opacity = "1"; }}
+                onMouseOut={(e) => { if (!loading) e.target.style.opacity = "0.7"; }}
+              >
+                Check Approval Status
+              </button>
+            )}
+          </>
+        )}
 
         <Link 
           to="/" 
